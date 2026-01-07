@@ -1,0 +1,36 @@
+# Dependencies
+node_modules
+vendor
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Build outputs
+/dist
+/build
+/out
+
+# Agent/System
+.agent/
+.opencode/
+.bmad/
+_bmad/
+_bmad-output/
+.gemini/
+*.pid
+temp_log.txt
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
