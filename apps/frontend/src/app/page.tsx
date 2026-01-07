@@ -63,7 +63,7 @@ export default function LandingPage() {
 
       {/* Events Grid */}
       <main className="container mx-auto py-12 px-4">
-        <h2 className="text-2xl font-bold mb-8">Upcoming Events</h2>
+        <h2 className="text-2xl font-bold mb-8 text-zinc-900 dark:text-zinc-50">Upcoming Events</h2>
 
         {isLoading ? (
           <div className="text-center py-20 text-zinc-500">Loading events...</div>
@@ -73,7 +73,7 @@ export default function LandingPage() {
               <Link
                 key={event.id}
                 href={`/${event.tenant.slug}/e/${event.slug}`}
-                className="group block rounded-xl overflow-hidden border bg-white dark:bg-zinc-950 hover:shadow-lg transition-shadow dark:border-zinc-800"
+                className="group block rounded-2xl overflow-hidden border bg-white dark:bg-zinc-950 hover:shadow-xl transition-all duration-300 dark:border-zinc-800"
               >
                 <div className="aspect-video bg-zinc-200 relative overflow-hidden">
                   {event.banner_url ? (
@@ -82,7 +82,7 @@ export default function LandingPage() {
                       alt={event.name}
                       fill
                       unoptimized
-                      className="object-cover group-hover:scale-105 transition-transform"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-zinc-400">
@@ -90,19 +90,23 @@ export default function LandingPage() {
                     </div>
                   )}
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-bold group-hover:text-blue-600 transition-colors">
+                <div className="p-5">
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-zinc-700 transition-colors text-zinc-900 dark:text-zinc-100">
                     {event.name}
                   </h3>
                   <div className="text-sm text-zinc-500 mt-2 flex flex-col gap-1">
-                    <span>{format(new Date(event.start_time), "PPP p")}</span>
-                    <span>📍 {event.location}</span>
+                    <span className="flex items-center gap-1">
+                      🕒 {format(new Date(event.start_time), "PPP p")}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      📍 {event.location}
+                    </span>
                   </div>
-                  <div className="mt-4 pt-4 border-t flex justify-between items-center dark:border-zinc-800">
-                    <span className="text-xs font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
+                  <div className="mt-4 pt-4 border-t flex justify-between items-center dark:border-zinc-800 border-zinc-100">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                       Starts from
                     </span>
-                    <span className="font-bold text-lg">
+                    <span className="font-bold text-lg text-zinc-900 dark:text-zinc-100">
                       {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(event.min_price)}
                     </span>
                   </div>
@@ -111,8 +115,8 @@ export default function LandingPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-zinc-100 rounded-xl dark:bg-zinc-800">
-            <h3 className="text-xl font-bold mb-2">No Events Found</h3>
+          <div className="text-center py-20 bg-zinc-100 rounded-2xl dark:bg-zinc-800">
+            <h3 className="text-xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">No Events Found</h3>
             <p className="text-zinc-500">Check back later for new events.</p>
           </div>
         )}

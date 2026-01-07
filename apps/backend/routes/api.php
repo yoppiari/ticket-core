@@ -55,8 +55,22 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     // Event Management
     Route::apiResource('events', \App\Http\Controllers\EventController::class);
 
+    // Leaderboard Management (Nested under Events)
+    Route::get('events/{event}/leaderboards', [\App\Http\Controllers\LeaderboardController::class, 'index']);
+    Route::post('events/{event}/leaderboards', [\App\Http\Controllers\LeaderboardController::class, 'store']);
+    Route::put('leaderboards/{id}', [\App\Http\Controllers\LeaderboardController::class, 'update']);
+    Route::delete('leaderboards/{id}', [\App\Http\Controllers\LeaderboardController::class, 'destroy']);
+    Route::get('leaderboards/{id}', [\App\Http\Controllers\LeaderboardController::class, 'show']);
+
     // Ticket Inventory (Nested)
     Route::resource('events.ticket-types', \App\Http\Controllers\TicketTypeController::class)->shallow();
+
+    // Pricing Tier Management (Nested under Ticket Types)
+    Route::get('ticket-types/{ticketTypeId}/pricing-tiers', [\App\Http\Controllers\PricingTierController::class, 'index']);
+    Route::post('ticket-types/{ticketTypeId}/pricing-tiers', [\App\Http\Controllers\PricingTierController::class, 'store']);
+    Route::put('pricing-tiers/{id}', [\App\Http\Controllers\PricingTierController::class, 'update']);
+    Route::delete('pricing-tiers/{id}', [\App\Http\Controllers\PricingTierController::class, 'destroy']);
+    Route::get('pricing-tiers/{id}', [\App\Http\Controllers\PricingTierController::class, 'show']);
 
     // Addons Management (Nested)
     Route::resource('events.addons', \App\Http\Controllers\AddonController::class)->shallow();
@@ -84,5 +98,8 @@ Route::prefix('public/events/{eventSlug}')->group(function () {
     Route::get('/queue-status', [\App\Http\Controllers\WaitingRoomController::class, 'status']);
     Route::post('/heartbeat', [\App\Http\Controllers\WaitingRoomController::class, 'heartbeat']);
 });
+
+// Embeddable Widgets API
+Route::get('/embed/leaderboards/{id}', [\App\Http\Controllers\LeaderboardController::class, 'embed']);
 
 Route::post('/webhooks/payment/{provider}', [\App\Http\Controllers\WebhookController::class, 'handle']);

@@ -51,6 +51,11 @@ class Event extends Model
         return $this->hasMany(Addon::class);
     }
 
+    public function leaderboards()
+    {
+        return $this->hasMany(Leaderboard::class);
+    }
+
     public function getCapacityAttribute()
     {
         return $this->ticketTypes()->sum('stock');

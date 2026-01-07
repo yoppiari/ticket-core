@@ -146,7 +146,9 @@ export default function AdminEventsPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="text-blue-600 hover:underline">Manage</button>
+                                        <Link href={`/admin/events/${event.id}`} className="text-blue-600 hover:underline">
+                                            Manage
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}

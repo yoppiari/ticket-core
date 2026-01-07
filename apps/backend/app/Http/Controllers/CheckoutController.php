@@ -77,7 +77,7 @@ class CheckoutController extends Controller
         // For the summary page - ensure user owns the order
         $userId = auth()->id() ?? Session::getId();
 
-        $order = \App\Models\Order::with(['items', 'event'])
+        $order = \App\Models\Order::with(['items', 'event.tenant'])
             ->where('id', $orderId)
             ->firstOrFail();
 
@@ -100,6 +100,8 @@ class CheckoutController extends Controller
         $order->items->transform(function ($item) {
             if ($item->item_type === 'seat') {
                 $item->details = \App\Models\Seat::find($item->item_id); // N+1 but ok for single order
+            } elseif ($item->item_type === 'ticket_type') {
+                $item->details = \App\Models\TicketType::find($item->item_id);
             } else {
                 $item->details = \App\Models\Addon::find($item->item_id);
             }

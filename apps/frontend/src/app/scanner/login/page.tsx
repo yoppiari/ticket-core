@@ -47,47 +47,60 @@ export default function ScannerLoginPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-10">
-            <div className="p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700">
-                <h2 className="text-2xl font-bold mb-6 text-center">Staff Login</h2>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4">
+            <div className="mb-8 text-center">
+                <div className="font-black text-2xl tracking-tighter text-white">SCANNER<span className="text-blue-500">APP</span></div>
+                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Staff Access Only</p>
+            </div>
+
+            <div className="w-full max-w-sm bg-zinc-900 p-8 rounded-2xl shadow-2xl border border-zinc-800 ring-1 ring-white/5">
+                <h2 className="text-xl font-bold mb-6 text-center text-white">Sign In</h2>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-900/50 border border-red-700 text-red-200 rounded text-sm">
+                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm font-medium">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-300">Email</label>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-zinc-500">Email</label>
                         <input
                             type="email"
-                            className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                            className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition placeholder:text-zinc-700"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            placeholder="staff@example.com"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-300">Password</label>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-zinc-500">Password</label>
                         <input
                             type="password"
-                            className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                            className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition placeholder:text-zinc-700"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            placeholder="••••••••"
                         />
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow transition disabled:opacity-50"
+                        className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all disabled:opacity-50 mt-2"
                     >
-                        {loading ? 'Logging in...' : 'Enter Scanner Mode'}
+                        {loading ? 'Verifying...' : 'Access Scanner'}
                     </button>
                 </form>
+            </div>
+
+            <div className="mt-8 text-center">
+                <div className="text-zinc-600 text-[10px] uppercase font-bold tracking-widest">
+                    Authorized Personnel Only
+                </div>
             </div>
         </div>
     );

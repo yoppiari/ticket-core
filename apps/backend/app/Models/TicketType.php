@@ -31,6 +31,11 @@ class TicketType extends Model
         return $this->belongsTo(Event::class);
     }
 
+    public function pricingTiers()
+    {
+        return $this->hasMany(PricingTier::class);
+    }
+
     public function scopeAvailable($query)
     {
         return $query->where(function ($q) {

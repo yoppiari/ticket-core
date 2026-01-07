@@ -17,8 +17,6 @@ export default function ReservationTimer({ expiresAt, onExpire }: ReservationTim
             return difference > 0 ? Math.floor(difference / 1000) : 0;
         };
 
-        setTimeLeft(calculateTimeLeft());
-
         const timer = setInterval(() => {
             const next = calculateTimeLeft();
             setTimeLeft(next);
