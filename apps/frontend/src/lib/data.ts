@@ -64,3 +64,21 @@ export async function sendHeartbeat(eventSlug: string) {
         return false;
     }
 }
+
+export async function getTenantEvents(tenantSlug: string) {
+    try {
+        const res = await fetch(`${API_URL}/api/public/events?tenant_slug=${tenantSlug}`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            console.error("Tenant Events Fetch Failed", res.status);
+            return [];
+        }
+
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to fetch tenant events", e);
+        return [];
+    }
+}

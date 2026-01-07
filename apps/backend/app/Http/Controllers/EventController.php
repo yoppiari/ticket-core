@@ -22,6 +22,23 @@ class EventController extends Controller
     }
 
     /**
+     * Get a specific event.
+     */
+    public function show(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Tenant Scope Check
+        if ($event->tenant_id !== $user->tenant_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $event->load(['ticketTypes.pricingTiers', 'addons', 'leaderboards']);
+
+        return response()->json($event);
+    }
+
+    /**
      * Create a new event.
      */
     public function store(Request $request)
@@ -78,5 +95,22 @@ class EventController extends Controller
         $event->update($validated);
 
         return response()->json($event);
+    }
+
+    /**
+     * Delete an event.
+     */
+    public function destroy(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Tenant Scope Check
+        if ($event->tenant_id !== $user->tenant_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $event->delete();
+
+        return response()->json(['message' => 'Event deleted']);
     }
 }

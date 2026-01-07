@@ -1,4 +1,3 @@
-
 import { getPublicEvent, sendHeartbeat } from "@/lib/data";
 import { notFound, redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,8 @@ import { CalendarIcon, MapPinIcon, TicketIcon, Share2Icon, BellIcon } from "luci
 import Image from "next/image";
 import TicketSelection from "./TicketSelection";
 import { Metadata } from 'next';
+import TenantHeader from "@/components/tenant/TenantHeader";
+import TenantFooter from "@/components/tenant/TenantFooter";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string, eventSlug: string }> }): Promise<Metadata> {
     const { slug, eventSlug } = await params;
@@ -36,15 +37,7 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
     return (
         <div className="min-h-screen bg-zinc-50 flex flex-col">
             {/* Header / Nav */}
-            <header
-                className="py-4 px-6 text-white shadow-md sticky top-0 z-10"
-                style={{ backgroundColor: tenant.branding?.primary_color || '#3b82f6' }}
-            >
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <div className="font-bold text-xl uppercase tracking-wider">{tenant.name}</div>
-                    <div className="text-sm opacity-90">Official Ticketing Platform</div>
-                </div>
-            </header>
+            <TenantHeader tenant={{ name: tenant.name, slug, branding: tenant.branding }} />
 
             {/* Hero Section */}
             <div className="bg-white border-b relative overflow-hidden">
@@ -165,9 +158,7 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
 
             </main>
 
-            <footer className="p-8 border-t mt-auto text-center text-zinc-400 text-xs font-medium uppercase tracking-widest border-zinc-200">
-                &copy; 2026 Ticketing Platform. Empowered by ANTIGRAVITY.
-            </footer>
+            <TenantFooter />
         </div>
     );
 }

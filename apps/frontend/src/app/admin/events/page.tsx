@@ -101,9 +101,9 @@ export default function AdminEventsPage() {
             <main className="container mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">Events</h1>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow">
+                    <Link href="/admin/events/create" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow">
                         Create New Event
-                    </button>
+                    </Link>
                 </div>
 
                 {error && (

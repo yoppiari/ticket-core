@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import PricingTierManager from "@/components/admin/PricingTierManager";
+import TicketTypeManager from "@/components/admin/TicketTypeManager";
+import AddonManager from "@/components/admin/AddonManager";
 
 export default function EditEventPage() {
     const { id } = useParams();
@@ -29,7 +30,7 @@ export default function EditEventPage() {
             });
             if (res.ok) {
                 const data = await res.json();
-                setEvent(data.data); // Assuming Laravel Resource returns wrapped data
+                setEvent(data); // Raw model return, no wrapper
             }
         } catch (error) {
             console.error(error);
@@ -50,6 +51,12 @@ export default function EditEventPage() {
                             &larr; Back to Events
                         </Link>
                         <span className="font-bold text-xl">{event.name}</span>
+                        <Link
+                            href={`/admin/events/${id}/edit`}
+                            className="text-sm bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-3 py-1.5 rounded transition-colors"
+                        >
+                            Edit Event
+                        </Link>
                     </div>
                 </div>
             </header>
@@ -69,24 +76,9 @@ export default function EditEventPage() {
                     </div>
                 </section>
 
-                <section className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm">
-                    <h2 className="text-lg font-bold mb-4">Ticket Types & Pricing</h2>
-                    <div className="space-y-6">
-                        {event.ticket_types?.map((tt: any) => (
-                            <div key={tt.id} className="border-b pb-6 last:border-0 last:pb-0">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 className="font-bold">{tt.name}</h3>
-                                        <p className="text-sm text-zinc-500">Base Price: {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(tt.price)}</p>
-                                    </div>
-                                    <span className="text-xs bg-zinc-100 px-2 py-1 rounded">Stock: {tt.stock}</span>
-                                </div>
+                <TicketTypeManager eventId={event.id} />
 
-                                <PricingTierManager ticketType={tt} />
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                <AddonManager eventId={event.id} />
 
                 <section className="mt-8">
                     <h2 className="text-lg font-bold mb-4">Embeddable Widgets</h2>

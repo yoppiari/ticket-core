@@ -11,12 +11,20 @@ class PublicEventController extends Controller
     /**
      * Show public event details.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = \App\Models\Event::with('tenant')
+        $query = \App\Models\Event::with('tenant')
             ->where('status', 'published')
-            ->where('end_date', '>', now())
-            ->withMin('ticketTypes', 'price')
+            ->where('end_date', '>', now());
+
+        if ($request->has('tenant_slug')) {
+            $slug = $request->query('tenant_slug');
+            $query->whereHas('tenant', function ($q) use ($slug) {
+                $q->where('slug', $slug);
+            });
+        }
+
+        $events = $query->withMin('ticketTypes', 'price')
             ->orderBy('start_date')
             ->get();
 
