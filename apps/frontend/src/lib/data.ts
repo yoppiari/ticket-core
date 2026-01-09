@@ -65,20 +65,20 @@ export async function sendHeartbeat(eventSlug: string) {
     }
 }
 
-export async function getTenantEvents(tenantSlug: string) {
+export async function getTenantEvents(tenantSlug: string, timeframe: 'upcoming' | 'past' | 'all' = 'upcoming') {
     try {
-        const res = await fetch(`${API_URL}/api/public/events?tenant_slug=${tenantSlug}`, {
+        const res = await fetch(`${API_URL}/api/public/events?tenant_slug=${tenantSlug}&timeframe=${timeframe}`, {
             cache: 'no-store'
         });
 
         if (!res.ok) {
-            console.error("Tenant Events Fetch Failed", res.status);
+            console.error(`Tenant Events (${timeframe}) Fetch Failed`, res.status);
             return [];
         }
 
         return await res.json();
     } catch (e) {
-        console.error("Failed to fetch tenant events", e);
+        console.error(`Failed to fetch tenant events (${timeframe})`, e);
         return [];
     }
 }

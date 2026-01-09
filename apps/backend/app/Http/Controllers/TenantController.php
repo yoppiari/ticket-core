@@ -69,6 +69,12 @@ class TenantController extends Controller
             'branding' => 'sometimes|array',
             'branding.logo' => 'sometimes|string', // Assuming URL or base64 for now
             'branding.primary_color' => ['sometimes', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'settings' => 'sometimes|array',
+            'settings.show_past_events' => 'sometimes|boolean',
+            'settings.bank_details' => 'sometimes|array',
+            'settings.bank_details.bank_name' => 'required_with:settings.bank_details|string',
+            'settings.bank_details.account_number' => 'required_with:settings.bank_details|string',
+            'settings.bank_details.account_holder' => 'required_with:settings.bank_details|string',
         ]);
 
         $tenant->update($validated);

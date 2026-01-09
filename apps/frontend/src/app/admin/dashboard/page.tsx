@@ -66,78 +66,90 @@ export default function AdminDashboardPage() {
         router.push('/login');
     }
 
+
+
     if (loading) return <div className="p-10 text-center">Loading dashboard...</div>;
 
+    // Layout is handled by /admin/layout.tsx
+    // We just need the main content here.
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
-            {/* Header */}
-            <header className="bg-white dark:bg-zinc-950 border-b dark:border-zinc-800">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="font-bold text-xl tracking-tight">Ticketing.io</Link>
-                        <span className="text-zinc-300">|</span>
-                        <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                            {user?.tenant?.name || 'Tenant'} Dashboard
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-zinc-500 hidden md:inline-block">Logged in as {user?.email}</span>
-                        <button
-                            onClick={handleLogout}
-                            className="text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded transition-colors"
-                        >
-                            Logout
-                        </button>
-                    </div>
+        <div className="p-4 md:p-8">
+            <h1 className="text-2xl font-bold mb-6">Overview</h1>
+
+            {error && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-8 border border-red-200">
+                    Error loading dashboard: {error}
                 </div>
-            </header>
+            )}
 
-            <main className="container mx-auto px-4 py-8">
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-8 border border-red-200">
-                        Error loading dashboard: {error}
-                    </div>
-                )}
-
-                <h1 className="text-2xl font-bold mb-6">Overview</h1>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Events Card */}
-                    <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Events Card */}
+                <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm flex flex-col justify-between h-full">
+                    <div>
                         <h3 className="text-sm font-medium text-zinc-500 mb-1">Total Events</h3>
                         <p className="text-3xl font-bold">{stats?.events_count ?? 0}</p>
                     </div>
+                </div>
 
-                    {/* Sales Card */}
-                    <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm">
+                {/* Sales Card */}
+                <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm flex flex-col justify-between h-full">
+                    <div>
                         <h3 className="text-sm font-medium text-zinc-500 mb-1">Total Revenue</h3>
-                        <p className="text-3xl font-bold">
+                        <div className="text-3xl font-bold truncate">
                             {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(stats?.total_sales ?? 0)}
-                        </p>
+                        </div>
                     </div>
+                </div>
 
-                    {/* Tickets Card */}
-                    <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm">
+                {/* Tickets Card */}
+                <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border dark:border-zinc-800 shadow-sm flex flex-col justify-between h-full">
+                    <div>
                         <h3 className="text-sm font-medium text-zinc-500 mb-1">Tickets Sold</h3>
                         <p className="text-3xl font-bold">{stats?.tickets_sold ?? 0}</p>
                     </div>
                 </div>
+            </div>
 
-                <div className="mt-12">
-                    <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-                    <div className="flex gap-4">
-                        <Link href="/admin/events" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow inline-block">
-                            View All Events
-                        </Link>
-                        <button className="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 rounded hover:bg-gray-50 transition shadow-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200">
-                            Create New Event
-                        </button>
-                        <button className="px-4 py-2 bg-white border border-zinc-200 text-zinc-700 rounded hover:bg-gray-50 transition shadow-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200">
-                            Manage Team
-                        </button>
-                    </div>
+            <div className="mt-12">
+                <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Link
+                        href="/admin/events"
+                        className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-center font-medium"
+                    >
+                        View All Events
+                    </Link>
+                    <Link
+                        href="/admin/events/create"
+                        className="flex items-center justify-center px-4 py-3 bg-white border border-zinc-200 text-zinc-700 rounded hover:bg-gray-50 transition shadow-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 text-center font-medium"
+                    >
+                        Create New Event
+                    </Link>
+                    <Link
+                        href="/admin/settings?tab=team"
+                        className="flex items-center justify-center px-4 py-3 bg-white border border-zinc-200 text-zinc-700 rounded hover:bg-gray-50 transition shadow-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 text-center font-medium"
+                    >
+                        Manage Team
+                    </Link>
                 </div>
-            </main>
+            </div>
+
+            <div className="mt-12 p-6 bg-gradient-to-r from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Tenant Settings</h3>
+                        <p className="text-sm text-zinc-500 max-w-xl">
+                            Configure your branding, financial details, and team members from the settings page.
+                        </p>
+                    </div>
+                    <Link
+                        href="/admin/settings"
+                        className="whitespace-nowrap px-6 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-lg font-medium hover:opacity-90 transition"
+                    >
+                        Go to Settings
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 }

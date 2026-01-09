@@ -100,7 +100,7 @@ export default function LeaderboardWidget() {
             </div>
 
             <div className="p-2 bg-zinc-50 dark:bg-zinc-900 text-center text-[10px] text-zinc-400 uppercase tracking-widest border-t dark:border-zinc-800">
-                Powered by Ticketing.io
+                Powered by Tukutix
             </div>
         </div>
     );

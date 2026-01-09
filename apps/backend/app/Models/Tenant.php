@@ -14,6 +14,7 @@ class Tenant extends Model
         'name',
         'slug',
         'branding',
+        'settings',
         'status',
         'plan_limit',
         'balance',
@@ -21,6 +22,7 @@ class Tenant extends Model
 
     protected $casts = [
         'branding' => 'array',
+        'settings' => 'array',
     ];
 
     public function users()

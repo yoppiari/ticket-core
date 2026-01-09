@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 export const metadata = {
-    title: "Ticketing Scanner",
+    title: "Tukutix Scanner",
     description: "Offline Gate Access Control",
     manifest: "/manifest.json", // Need to generate this? Or assume existing
 };

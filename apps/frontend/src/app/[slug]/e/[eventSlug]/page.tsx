@@ -1,5 +1,6 @@
 import { getPublicEvent, sendHeartbeat } from "@/lib/data";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +142,9 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
                             <div className="pt-4 border-t border-zinc-200">
                                 <div className="text-[11px] font-black uppercase text-zinc-400 tracking-wider mb-2">Organizer</div>
                                 <div className="text-zinc-900 font-bold">{tenant.name}</div>
+                                <Link href={`/${tenant.slug}`} className="inline-flex items-center gap-1 text-amber-600 text-xs font-bold mt-2 hover:underline">
+                                    View Profile &rarr;
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>

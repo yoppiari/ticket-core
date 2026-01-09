@@ -53,7 +53,7 @@ class DemoSeeder extends Seeder
         $event = Event::updateOrCreate(
             ['slug' => 'demo-event', 'tenant_id' => $tenant->id],
             [
-                'name' => 'Ticketing Demo 2026',
+                'name' => 'Tukutix Use Case 2026',
                 'venue_name' => 'Jakarta Convention Center',
                 'venue_address' => 'Jl. Gatot Subroto',
                 'start_date' => now()->addDays(7),

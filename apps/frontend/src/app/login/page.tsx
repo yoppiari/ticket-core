@@ -57,7 +57,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
-            <div className="mb-8 font-black text-2xl tracking-tighter text-zinc-900 dark:text-white">Ticketing.io</div>
+            <div className="mb-8 font-black text-2xl tracking-tighter text-zinc-900 dark:text-white">Tukutix</div>
             <div className="w-full max-w-sm bg-white dark:bg-zinc-950 p-8 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-800">
                 <div className="text-center mb-8">
                     <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>

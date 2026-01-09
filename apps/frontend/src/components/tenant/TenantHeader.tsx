@@ -26,7 +26,7 @@ export default function TenantHeader({ tenant, className }: TenantHeaderProps) {
                     <div className="font-bold text-xl uppercase tracking-wider">{tenant.name}</div>
                 </Link>
                 <Link href="/" className="hover:opacity-100 transition-opacity">
-                    <div className="text-sm opacity-90 font-normal">Official Ticketing Platform</div>
+                    <div className="text-sm opacity-90 font-normal">Powered by Tukutix</div>
                 </Link>
             </div>
         </header>

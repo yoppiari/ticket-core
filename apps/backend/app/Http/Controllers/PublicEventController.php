@@ -14,8 +14,7 @@ class PublicEventController extends Controller
     public function index(Request $request)
     {
         $query = \App\Models\Event::with('tenant')
-            ->where('status', 'published')
-            ->where('end_date', '>', now());
+            ->where('status', 'published');
 
         if ($request->has('tenant_slug')) {
             $slug = $request->query('tenant_slug');
@@ -24,8 +23,20 @@ class PublicEventController extends Controller
             });
         }
 
+        // Timeframe filter
+        $timeframe = $request->query('timeframe', 'upcoming');
+        if ($timeframe === 'past') {
+            $query->where('end_date', '<', now())
+                ->orderBy('start_date', 'desc'); // Past events usually wanted latest first
+        } elseif ($timeframe === 'upcoming') {
+            $query->where('end_date', '>', now())
+                ->orderBy('start_date', 'asc');
+        } else {
+            // timeframe=all, no date filter
+            $query->orderBy('start_date', 'desc');
+        }
+
         $events = $query->withMin('ticketTypes', 'price')
-            ->orderBy('start_date')
             ->get();
 
         return response()->json($events->map(function ($event) {
@@ -75,7 +86,8 @@ class PublicEventController extends Controller
                 'slug' => $tenant->slug,
                 'branding' => $tenant->branding,
             ],
-            'event' => $event
+            'event' => $event,
+            'settings' => $tenant->settings, // Expose settings so frontend knows if past events should be shown
         ]);
     }
 }

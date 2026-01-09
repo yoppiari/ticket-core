@@ -93,7 +93,7 @@ function MockPaymentContent() {
                     <div className="space-y-4">
                         <div className="flex justify-between text-sm py-2 border-b">
                             <span className="text-slate-500">Merchant</span>
-                            <span className="font-medium">Ticketing Platform</span>
+                            <span className="font-medium">Tukutix Payments</span>
                         </div>
                         <div className="flex justify-between text-sm py-2 border-b">
                             <span className="text-slate-500">Order ID</span>

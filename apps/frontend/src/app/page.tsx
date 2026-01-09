@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { format } from "date-fns";
 import Image from "next/image";
+import { SiteFooter } from "@/components/SiteFooter";
 
 interface Event {
   id: string;
@@ -35,7 +36,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-zinc-950 dark:border-zinc-800">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tighter">Ticketing.io</span>
+            <span className="text-xl font-bold tracking-tighter">Tukutix</span>
           </div>
           <nav className="flex items-center gap-4">
             <Link href="/scanner/login" className="text-sm font-medium hover:underline">
@@ -121,6 +122,8 @@ export default function LandingPage() {
           </div>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

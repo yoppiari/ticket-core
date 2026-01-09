@@ -103,7 +103,7 @@ export default function TicketWidget() {
                     target="_blank"
                     className="text-[10px] text-zinc-400 uppercase tracking-widest hover:text-zinc-600"
                 >
-                    Powered by Ticketing.io
+                    Powered by Tukutix
                 </a>
             </div>
         </div>

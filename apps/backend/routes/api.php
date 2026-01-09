@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     // Team Management
     Route::post('/team/invite', [\App\Http\Controllers\TeamController::class, 'invite']);
+    Route::get('/team', [\App\Http\Controllers\TeamController::class, 'index']);
+    Route::delete('/team/{userId}', [\App\Http\Controllers\TeamController::class, 'destroy']);
 
     // Dashboard
     Route::get('/dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'stats']);
