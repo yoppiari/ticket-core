@@ -20,7 +20,7 @@ class CheckoutService
     }
 
 
-    public function createOrder(Event $event, $userId, array $seatIds = [], array $ticketQuantities = [], array $addonSelections = [], $affiliateId = null)
+    public function createOrder(Event $event, $userId, array $seatIds = [], array $ticketQuantities = [], array $addonSelections = [], $affiliateId = null, $buyerName = null, $buyerEmail = null, $buyerWhatsapp = null, $deliveryMethod = 'email')
     {
         // ... (validation logic same as before) ...
         // 1. Validate Seats
@@ -39,7 +39,7 @@ class CheckoutService
             }
         }
 
-        return DB::transaction(function () use ($event, $userId, $seatIds, $ticketQuantities, $addonSelections, $affiliateId) {
+        return DB::transaction(function () use ($event, $userId, $seatIds, $ticketQuantities, $addonSelections, $affiliateId, $buyerName, $buyerEmail, $buyerWhatsapp, $deliveryMethod) {
             $totalAmount = 0;
             $orderItemsData = [];
 
@@ -145,6 +145,10 @@ class CheckoutService
                 'expires_at' => now()->addMinutes(15),
                 'affiliate_id' => $affiliateId,
                 'commission_amount' => $commissionAmount,
+                'buyer_name' => $buyerName,
+                'buyer_email' => $buyerEmail,
+                'buyer_whatsapp' => $buyerWhatsapp,
+                'delivery_method' => $deliveryMethod,
             ]);
 
             // 5. Save Items

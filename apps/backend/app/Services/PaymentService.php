@@ -11,10 +11,17 @@ class PaymentService
 {
     protected PaymentGatewayInterface $gateway;
     protected RevenueService $revenueService;
+    protected TicketService $ticketService;
+    protected NotificationService $notificationService;
 
-    public function __construct(RevenueService $revenueService)
-    {
+    public function __construct(
+        RevenueService $revenueService,
+        TicketService $ticketService,
+        NotificationService $notificationService
+    ) {
         $this->revenueService = $revenueService;
+        $this->ticketService = $ticketService;
+        $this->notificationService = $notificationService;
 
         // Simple factory logic based on config
         // In real app, bind this in AppServiceProvider
@@ -71,7 +78,14 @@ class PaymentService
             // 4. Calculate Revenue
             $this->revenueService->processRevenueShare($order);
 
-            // Trigger events? Send Email?
+            // 5. Generate & Send Tickets
+            try {
+                $this->ticketService->generateTickets($order);
+                $this->notificationService->sendTickets($order);
+            } catch (\Exception $e) {
+                // Log but don't fail the webhook response
+                \Illuminate\Support\Facades\Log::error("Failed to deliver tickets: " . $e->getMessage());
+            }
         } elseif ($data['status'] === 'failed') {
             $order->status = 'failed';
             $order->save();

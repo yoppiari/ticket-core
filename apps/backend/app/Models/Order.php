@@ -19,6 +19,10 @@ class Order extends Model
         'expires_at',
         'affiliate_id',
         'commission_amount',
+        'buyer_name',
+        'buyer_email',
+        'buyer_whatsapp',
+        'delivery_method',
     ];
 
     protected $casts = [

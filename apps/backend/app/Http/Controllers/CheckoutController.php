@@ -27,6 +27,11 @@ class CheckoutController extends Controller
             'tickets.*' => 'integer|min:1',
             'addons' => 'nullable|array',
             'addons.*' => 'integer|min:0',
+            'buyer_name' => 'required|string',
+            'buyer_email' => 'required|email',
+            'buyer_phone' => 'missing', // removed
+            'buyer_whatsapp' => 'required|string',
+            'delivery_method' => 'required|in:email,whatsapp,both',
         ]);
 
         if (empty($validated['seat_ids']) && empty($validated['tickets'])) {
@@ -55,7 +60,11 @@ class CheckoutController extends Controller
                 $validated['seat_ids'] ?? [],
                 $validated['tickets'] ?? [],
                 $validated['addons'] ?? [],
-                $affiliateId // Passing new arg
+                $affiliateId,
+                $validated['buyer_name'],
+                $validated['buyer_email'],
+                $validated['buyer_whatsapp'],
+                $validated['delivery_method']
             );
 
             return response()->json([
