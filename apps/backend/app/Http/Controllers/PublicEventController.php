@@ -71,8 +71,14 @@ class PublicEventController extends Controller
             $query->orderBy('start_date', 'desc');
         }
 
-        $events = $query->withMin('ticketTypes', 'price')
-            ->get();
+        // Cache key based on query params to ensure filters work
+        $cacheKey = 'public_events_' . md5(json_encode($request->all()));
+
+        $events = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($query) {
+            return $query->withMin('ticketTypes', 'price')
+                ->limit(12)
+                ->get();
+        });
 
         return response()->json($events->map(function ($event) {
             return [
@@ -80,8 +86,7 @@ class PublicEventController extends Controller
                 'slug' => $event->slug,
                 'name' => $event->name,
                 'banner_url' => $event->banner_url,
-                'start_time' => $event->start_date, // Note: Model has start_date, Resource returns start_time alias if needed, but let's stick to start_date or map it.
-                // The frontend expects start_time, let's map start_date to it.
+                'start_time' => $event->start_date,
                 'location' => $event->venue_name . ', ' . $event->venue_address,
                 'min_price' => $event->ticket_types_min_price ?? 0,
                 'tenant' => [
