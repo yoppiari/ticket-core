@@ -42,6 +42,9 @@ export default function EditEventPage() {
         instagram_url: '',
         website_url: '',
         status: 'draft',
+        affiliate_enabled: false,
+        commission_type: 'percent',
+        commission_value: 0,
     });
 
     useEffect(() => {
@@ -85,6 +88,9 @@ export default function EditEventPage() {
                     instagram_url: data.social_media?.instagram || '',
                     website_url: data.social_media?.website || '',
                     status: data.status || 'draft',
+                    affiliate_enabled: data.affiliate_enabled || false,
+                    commission_type: data.commission_type || 'percent',
+                    commission_value: data.commission_value || 0,
                 });
             } catch (err: any) {
                 console.error(err);
@@ -463,6 +469,65 @@ export default function EditEventPage() {
                                         placeholder="https://..."
                                     />
                                 </div>
+                            </div>
+
+                            {/* Affiliate Settings */}
+                            <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-semibold dark:text-white">Affiliate Program</h3>
+                                        <p className="text-xs text-zinc-500">Allow affiliates to promote this event.</p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.affiliate_enabled}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, affiliate_enabled: e.target.checked }))}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+
+                                {formData.affiliate_enabled && (
+                                    <div className="grid grid-cols-2 gap-4 pt-2">
+                                        <div>
+                                            <label className="block text-xs font-medium mb-1 dark:text-zinc-300">Commission Type</label>
+                                            <select
+                                                value={formData.commission_type}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, commission_type: e.target.value, commission_value: 0 }))}
+                                                className="w-full px-3 py-2 text-sm border rounded-md dark:bg-zinc-900 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            >
+                                                <option value="percent">Percentage (%)</option>
+                                                <option value="fixed">Fixed Amount (Rp)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium mb-1 dark:text-zinc-300">Value</label>
+                                            <div className="relative">
+                                                {formData.commission_type === 'fixed' && (
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <span className="text-gray-500 sm:text-sm">Rp</span>
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step={formData.commission_type === 'percent' ? "0.1" : "1000"}
+                                                    value={formData.commission_value}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, commission_value: parseFloat(e.target.value) || 0 }))}
+                                                    className={`w-full py-2 text-sm border rounded-md dark:bg-zinc-900 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none ${formData.commission_type === 'fixed' ? 'pl-9 pr-3' : 'pl-3 pr-8'}`}
+                                                    placeholder={formData.commission_type === 'percent' ? "e.g. 5" : "e.g. 10000"}
+                                                />
+                                                {formData.commission_type === 'percent' && (
+                                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                        <span className="text-gray-500 sm:text-sm">%</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

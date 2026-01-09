@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Affiliate Routes
     Route::prefix('affiliates')->group(function () {
         Route::post('/register', [\App\Http\Controllers\AffiliateController::class, 'register']);
+        Route::get('/marketplace', [\App\Http\Controllers\AffiliateController::class, 'marketplace']);
         Route::get('/stats', [\App\Http\Controllers\AffiliateController::class, 'stats']);
     });
 });
@@ -76,6 +77,9 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     // Addons Management (Nested)
     Route::resource('events.addons', \App\Http\Controllers\AddonController::class)->shallow();
+
+    // Affiliate Management (Tenant View)
+    Route::get('/affiliates', [\App\Http\Controllers\AffiliateController::class, 'index']);
 });
 
 Route::get('/tenants/{slug}', [\App\Http\Controllers\TenantController::class, 'show']);

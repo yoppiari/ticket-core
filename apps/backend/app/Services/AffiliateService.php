@@ -9,15 +9,19 @@ use Illuminate\Support\Str;
 
 class AffiliateService
 {
-    public function register(User $user, Tenant $tenant, array $data)
+    public function register(User $user, ?Tenant $tenant, array $data)
     {
-        // Check if already registered for this tenant
-        $exists = Affiliate::where('user_id', $user->id)
-            ->where('tenant_id', $tenant->id)
-            ->exists();
+        // Check if already registered (Global or Tenant)
+        $query = Affiliate::where('user_id', $user->id);
 
-        if ($exists) {
-            throw new \Exception("User is already an affiliate for this tenant.");
+        if ($tenant) {
+            $query->where('tenant_id', $tenant->id);
+        } else {
+            $query->whereNull('tenant_id');
+        }
+
+        if ($query->exists()) {
+            throw new \Exception("User is already registered as an affiliate.");
         }
 
         // Generate Referral Code
@@ -31,9 +35,9 @@ class AffiliateService
 
         return Affiliate::create([
             'user_id' => $user->id,
-            'tenant_id' => $tenant->id,
+            'tenant_id' => $tenant ? $tenant->id : null,
             'referral_code' => $code,
-            'commission_rate' => 0.05, // Default 5%
+            'commission_rate' => 0.00, // Deprecated: Commission is now Event-based
             'bank_details' => $data['bank_details'] ?? null,
         ]);
     }

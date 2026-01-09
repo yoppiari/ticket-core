@@ -51,7 +51,7 @@ export default function TenantSettingsPage() {
         bank_name: "",
         account_number: "",
         account_holder: "",
-        show_past_events: false,
+        show_past_events: true,
     });
 
     useEffect(() => {
@@ -83,7 +83,7 @@ export default function TenantSettingsPage() {
                 bank_name: settings.bank_details?.bank_name || "",
                 account_number: settings.bank_details?.account_number || "",
                 account_holder: settings.bank_details?.account_holder || "",
-                show_past_events: settings.show_past_events === true,
+                show_past_events: settings.show_past_events !== false,
             });
 
             // Fetch Team
@@ -372,6 +372,19 @@ export default function TenantSettingsPage() {
                         <Card>
                             <CardHeader><CardTitle>Team Management</CardTitle></CardHeader>
                             <CardContent>
+                                <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                                    <h4 className="font-semibold text-sm mb-2 text-blue-900 dark:text-blue-100">Hak Akses Role</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-zinc-600 dark:text-zinc-400">
+                                        <div className="space-y-1">
+                                            <p><span className="font-bold text-purple-700 dark:text-purple-400">Owner:</span> Akses penuh (Kelola Tim, Keuangan, Event)</p>
+                                            <p><span className="font-bold text-blue-700 dark:text-blue-400">Admin:</span> Kelola Event & Laporan (Tanpa akses Tim/Bank)</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p><span className="font-bold text-zinc-700 dark:text-zinc-300">Staff:</span> Edit Event terbatas (Tidak bisa Hapus Event/Kelola Tim)</p>
+                                            <p><span className="font-bold text-green-700 dark:text-green-400">Scanner:</span> Hanya akses aplikasi Scanner (Check-in)</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="flex gap-4 p-4 bg-zinc-50 dark:bg-zinc-900 rounded mb-6 border dark:border-zinc-800 items-end">
                                     <div className="flex-1">
                                         <label className="block text-xs font-medium uppercase text-zinc-500 mb-1">New Member Email</label>

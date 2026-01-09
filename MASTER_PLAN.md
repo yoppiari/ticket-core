@@ -655,10 +655,22 @@ Frontend:
 
 ### FEBRUARI
 
-#### Week 5: Affiliate System + Tiered Pricing
+#### Week 5: Super Admin Dashboard + Affiliate System
 
-**Stream 1: Affiliate System (Backend 1 + Frontend 1)**
+**Stream 1: Super Admin Dashboard (New)**
+Backend:
+- [ ] Super Admin Role (system_admin)
+- [ ] Tenant Management API (List, Suspend, Upgrade, Create - Exclusive)
+- [ ] Withdrawal Approval API (List Pending, Approve, Reject)
+- [ ] Platform Analytics API
 
+Frontend:
+- [ ] Super Admin Layout (Sidebar distinct from Tenant Admin)
+- [ ] Tenant List Page (with Create Tenant Modal)
+- [ ] Withdrawal Approval Page
+- [ ] Platform Overview
+
+**Stream 2: Affiliate System (Backend 1 + Frontend 1)**
 Backend:
 - [ ] Affiliate model (personal info, referral code, commission)
 - [ ] Affiliate registration API

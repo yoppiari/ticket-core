@@ -34,9 +34,13 @@ export default function ScannerLoginPage() {
                 throw new Error('Invalid credentials');
             }
 
-            // Token handling? Sanctum cookies usually handled by browser.
-            // If stateless token, might need to store it.
-            // Let's assume cookie-based session for now.
+            const data = await res.json();
+
+            // Store token for offline PWA usage
+            localStorage.setItem('auth_token', data.token);
+            if (data.user) {
+                localStorage.setItem('auth_user', JSON.stringify(data.user));
+            }
 
             router.push('/scanner/scan');
         } catch (err: any) {

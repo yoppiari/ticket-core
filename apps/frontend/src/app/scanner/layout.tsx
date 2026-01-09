@@ -1,14 +1,25 @@
 import { ReactNode } from "react";
 
 export const metadata = {
-    title: "Tukutix Scanner",
-    description: "Offline Gate Access Control",
-    manifest: "/manifest.json", // Need to generate this? Or assume existing
+    title: 'Tukutix Scanner',
+    description: 'Scanner App for Tukutix Gate Staff',
+    manifest: '/manifest.json',
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
+    themeColor: '#000000',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black-translucent',
+        title: 'Tukutix Scanner',
+    },
 };
 
-export default function ScannerLayout({ children }: { children: ReactNode }) {
+export default function ScannerLayout({
+    children,
+}: {
+    children: ReactNode
+}) {
     return (
-        <div className="min-h-screen bg-gray-900 text-white">
+        <div className="min-h-screen bg-black text-white">
             {/* 
         Scanner App Header 
         Simple, high contrast, no navigation links to consumer pages

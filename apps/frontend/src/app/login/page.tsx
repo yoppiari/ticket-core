@@ -44,6 +44,11 @@ export default function LoginPage() {
             // Redirect based on role or default
             if (data.user?.role === 'owner' || data.user?.role === 'admin') {
                 router.push('/admin/dashboard');
+            } else if (data.user?.role === 'super_admin' || data.user?.role === 'system_admin') {
+                // Prevent System Admin from logging in here
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_info');
+                throw new Error("Please use the System Admin Portal to login.");
             } else {
                 router.push('/');
             }

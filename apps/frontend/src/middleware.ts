@@ -42,11 +42,29 @@ export default async function middleware(req: NextRequest) {
         currentHost !== "www.localhost" &&
         !currentHost.endsWith(".vercel.app"); // Adjust as needed
 
+    // Affiliate Logic: Check for ?ref=CODE
+    // We want to capture it and set a cookie, then proceed.
+    // We can do this before or after subdomain rewrite.
+    const urlSearchParams = req.nextUrl.searchParams;
+    const refCode = urlSearchParams.get("ref");
+
+    let response = NextResponse.next();
+
     if (isSubdomain) {
         const subdomain = currentHost.split(".")[0];
         // Rewrite to the tenant dynamic route
-        return NextResponse.rewrite(new URL(`/_tenants/${subdomain}${url.pathname}`, req.url));
+        response = NextResponse.rewrite(new URL(`/_tenants/${subdomain}${url.pathname}`, req.url));
     }
 
-    return NextResponse.next();
+    if (refCode) {
+        // Set cookie for 30 days
+        response.cookies.set("affiliate_ref", refCode, {
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+            path: "/",
+            // httpOnly: true, // If we want to hide it from validation scripts? No, keep it accessible if needed.
+            // secure: process.env.NODE_ENV === 'production',
+        });
+    }
+
+    return response;
 }

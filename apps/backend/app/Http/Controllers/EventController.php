@@ -65,7 +65,12 @@ class EventController extends Controller
             'terms_and_conditions' => 'nullable|string',
             'facilities' => 'nullable|string',
             'social_media' => 'nullable|array',
+            'social_media' => 'nullable|array',
             'status' => 'required|in:draft,published',
+            // Affiliate Settings
+            'affiliate_enabled' => 'nullable|boolean',
+            'commission_type' => 'required_if:affiliate_enabled,true|in:percent,fixed',
+            'commission_value' => 'required_if:affiliate_enabled,true|numeric|min:0',
         ]);
 
         $event = Event::create([
@@ -102,6 +107,9 @@ class EventController extends Controller
             'terms_and_conditions' => 'nullable|string',
             'facilities' => 'nullable|string',
             'social_media' => 'nullable|array',
+            'affiliate_enabled' => 'nullable|boolean',
+            'commission_type' => 'nullable|in:percent,fixed',
+            'commission_value' => 'nullable|numeric|min:0',
         ]);
 
         $event->update($validated);
@@ -119,6 +127,11 @@ class EventController extends Controller
         // Tenant Scope Check
         if ($event->tenant_id !== $user->tenant_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Role Check: Staff simply cannot delete events
+        if (in_array($user->role, ['staff', 'scanner'])) {
+            return response()->json(['message' => 'Unauthorized. Staff/Scanner tidak memiliki akses hapus event.'], 403);
         }
 
         $event->delete();

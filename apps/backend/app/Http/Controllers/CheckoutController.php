@@ -41,14 +41,13 @@ class CheckoutController extends Controller
         $userId = auth()->id() ?? Session::getId();
 
         // 6-3 Affiliate Logic
-        $affiliateId = null;
-        $commissionAmount = 0;
-        $refCode = $request->cookie('affiliate_ref');
+        $refCode = $request->cookie('affiliate_ref') ?? $request->query('ref');
+
         if ($refCode) {
             // Lazy load service or direct model usage
             $affiliate = \App\Models\Affiliate::where('referral_code', $refCode)->first();
 
-            if ($affiliate && $affiliate->tenant_id === $event->tenant_id) {
+            if ($affiliate && ($affiliate->tenant_id === null || $affiliate->tenant_id === $event->tenant_id)) {
                 $affiliateId = $affiliate->id;
             }
         }

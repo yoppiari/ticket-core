@@ -28,6 +28,10 @@ class Event extends Model
         'leaderboard_config',
         'banner_url',
         'seat_map_layout',
+        // Affiliate Settings
+        'affiliate_enabled',
+        'commission_type',
+        'commission_value',
     ];
 
     protected $casts = [

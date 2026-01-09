@@ -114,15 +114,33 @@ class CheckoutService
 
             // Calculate Commission
             $commissionAmount = 0;
-            if ($affiliateId) {
-                // We should ideally load this outside transaction or pass rate. 
-                // But for safety let's load here.
+            if ($affiliateId && $event->affiliate_enabled) {
+                // Verify affiliate exists (global or tenant specific check if we kept it)
+                // With global affiliates, we just need to ensure the ID is valid.
                 $affiliate = \App\Models\Affiliate::find($affiliateId);
+
                 if ($affiliate) {
-                    $commissionAmount = $totalAmount * $affiliate->commission_rate;
+                    if ($event->commission_type === 'percent') {
+                        $commissionAmount = $totalAmount * ($event->commission_value / 100);
+                    } else {
+                        // Fixed amount per TICKET/ITEM? Or per ORDER? 
+                        // Usually fixed is per ticket sold.
+                        // Impl Plan said: event->commission_value * ticket_quantity
+
+                        // Calculate total items quantity (tickets + seats)
+                        $totalItems = 0;
+                        foreach ($orderItemsData as $item) {
+                            if (in_array($item['item_type'], ['ticket_type', 'seat'])) {
+                                $totalItems += $item['quantity'];
+                            }
+                        }
+                        $commissionAmount = $totalItems * $event->commission_value;
+                    }
                 } else {
                     $affiliateId = null; // Reset if invalid
                 }
+            } else {
+                $affiliateId = null; // Clear if disabled
             }
 
             // 4. Create Order

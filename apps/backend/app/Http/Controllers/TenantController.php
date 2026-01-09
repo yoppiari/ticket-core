@@ -16,6 +16,11 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
+        $user = $request->user();
+        if ($user->role !== 'super_admin' && $user->role !== 'system_admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         // 1. Validation (System Admin level)
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -53,8 +58,15 @@ class TenantController extends Controller
     /**
      * List all tenants (System Admin only).
      */
-    public function index()
+    public function index(Request $request)
     {
+        $user = $request->user();
+
+        // Enforce role check: Only System Admin can see all tenants
+        if ($user->role !== 'super_admin' && $user->role !== 'system_admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         return response()->json(Tenant::all());
     }
 
@@ -76,6 +88,13 @@ class TenantController extends Controller
             'settings.bank_details.account_number' => 'required_with:settings.bank_details|string',
             'settings.bank_details.account_holder' => 'required_with:settings.bank_details|string',
         ]);
+
+        $user = $request->user();
+
+        // Only Owner can update sensitive tenant settings
+        if ($user->role !== 'owner') {
+            return response()->json(['message' => 'Unauthorized. Only Owners can update settings.'], 403);
+        }
 
         $tenant->update($validated);
 

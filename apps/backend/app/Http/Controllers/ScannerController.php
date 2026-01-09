@@ -17,11 +17,17 @@ class ScannerController extends Controller
 
     public function getTickets(Request $request, $eventId)
     {
-        // Add Gate Staff Check Middleware or Policy here in real app
-        // e.g. $this->authorize('view', $event);
+        $user = Auth::user();
+        if (!$user->tenant_id) {
+            abort(403, 'User does not belong to a tenant');
+        }
 
-        $tickets = $this->scannerService->getTicketsForEvent($eventId);
-        return response()->json($tickets);
+        try {
+            $tickets = $this->scannerService->getTicketsForEvent($eventId, $user->tenant_id);
+            return response()->json($tickets);
+        } catch (\Exception $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     public function syncLogs(Request $request, $eventId)
@@ -33,9 +39,12 @@ class ScannerController extends Controller
             'logs.*.event_id' => 'required|in:' . $eventId,
         ]);
 
-        $gateStaffId = Auth::id(); // Assumes auth:sanctum
+        $user = Auth::user();
+        if (!$user->tenant_id) {
+            abort(403, 'User does not belong to a tenant');
+        }
 
-        $results = $this->scannerService->processSyncLogs($request->logs, $gateStaffId);
+        $results = $this->scannerService->processSyncLogs($request->logs, $user);
 
         return response()->json(['results' => $results]);
     }

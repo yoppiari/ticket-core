@@ -94,17 +94,36 @@ export default function ScanPage() {
         }
     }, [eventId]);
 
+    useEffect(() => {
+        // Auth Check
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = '/scanner/login';
+        }
+    }, []);
+
     async function downloadTickets() {
         if (!inputEventId) return;
+        const token = localStorage.getItem('auth_token');
+        if (!token) return;
+
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scanner/events/${inputEventId}/tickets`);
-            if (!res.ok) throw new Error('Failed to fetch');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scanner/events/${inputEventId}/tickets`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+            if (!res.ok) {
+                if (res.status === 403) throw new Error('Access Denied: Invalid Event for your Tenant');
+                throw new Error('Failed to fetch');
+            }
             const tickets = await res.json();
             await saveTickets(tickets);
             setEventId(inputEventId);
             alert(`Downloaded ${tickets.length} tickets! Ready to scan.`);
-        } catch (err) {
-            alert('Error downloading tickets: ' + err);
+        } catch (err: any) {
+            alert('Error downloading tickets: ' + err.message);
         }
     }
 
@@ -113,10 +132,17 @@ export default function ScanPage() {
         const logs = await getPendingLogs();
         if (logs.length === 0) return;
 
+        const token = localStorage.getItem('auth_token');
+        if (!token) return;
+
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scanner/events/${eventId}/logs`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ logs }),
             });
             if (res.ok) {
@@ -131,20 +157,37 @@ export default function ScanPage() {
 
     if (!eventId) {
         return (
-            <div className="p-6 text-center space-y-4">
-                <h2 className="text-xl">Select Event</h2>
-                <input
-                    className="w-full p-2 bg-gray-800 border rounded"
-                    placeholder="Event ID (UUID)"
-                    value={inputEventId}
-                    onChange={e => setInputEventId(e.target.value)}
-                />
-                <button
-                    onClick={downloadTickets}
-                    className="w-full bg-blue-600 p-3 rounded font-bold"
-                >
-                    Download Tickets & Start
-                </button>
+            <div className="min-h-screen flex items-center justify-center p-6 bg-zinc-950 text-white">
+                <div className="w-full max-w-sm space-y-6">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-black tracking-tight">Select Event</h2>
+                        <p className="text-zinc-500 text-sm">Enter Event ID to download tickets</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <input
+                            className="w-full p-4 bg-zinc-900 border border-zinc-800 rounded-xl text-white outline-none focus:ring-1 focus:ring-blue-500 transition font-mono text-center"
+                            placeholder="UUID"
+                            value={inputEventId}
+                            onChange={e => setInputEventId(e.target.value)}
+                        />
+                        <button
+                            onClick={downloadTickets}
+                            className="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold shadow-lg shadow-blue-900/20 transition"
+                        >
+                            Download Database
+                        </button>
+                    </div>
+
+                    <div className="text-center">
+                        <button onClick={() => {
+                            localStorage.removeItem('auth_token');
+                            window.location.href = '/scanner/login';
+                        }} className="text-xs text-zinc-500 underline uppercase tracking-widest font-bold">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -157,7 +200,7 @@ export default function ScanPage() {
             {/* Result Overlay */}
             {scanResult && (
                 <div className={`p-4 rounded text-center font-bold text-xl ${scanResult.status === 'valid' ? 'bg-green-600' :
-                        scanResult.status === 'duplicate' ? 'bg-yellow-600' : 'bg-red-600'
+                    scanResult.status === 'duplicate' ? 'bg-yellow-600' : 'bg-red-600'
                     }`}>
                     <div>{scanResult.status.toUpperCase()}</div>
                     <div className="text-sm font-normal mt-1">{scanResult.message}</div>

@@ -156,10 +156,22 @@ class DemoSeeder extends Seeder
             ]
         );
 
+        // 8. Create Super Admin
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'superadmin@tukutix.com'],
+            [
+                'name' => 'System Administrator',
+                'password' => Hash::make('password'),
+                'role' => 'super_admin',
+                'tenant_id' => null, // Super Admin has no tenant
+            ]
+        );
+
         $this->command->info('Demo data seeded successfully!');
         $this->command->info('Owner: owner@example.com');
         $this->command->info('Staff: staff@example.com');
         $this->command->info('Affiliate: affiliate@example.com / Code: DEMO2026');
         $this->command->info('User: user@example.com');
+        $this->command->info('Super Admin: superadmin@tukutix.com');
     }
 }
