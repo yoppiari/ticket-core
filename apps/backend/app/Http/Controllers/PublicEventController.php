@@ -5,9 +5,44 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class PublicEventController extends Controller
 {
+    /**
+     * Subscribe to event reminders.
+     */
+    public function remind(Request $request, $tenantSlug, $eventSlug)
+    {
+        $tenant = Tenant::where('slug', $tenantSlug)->firstOrFail();
+        $event = Event::where('tenant_id', $tenant->id)
+            ->where('slug', $eventSlug)
+            ->firstOrFail();
+
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        try {
+            $event->reminders()->create([
+                'tenant_id' => $tenant->id,
+                'email' => $request->email
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Check for duplicate entry constraint violation
+            if ($e->errorInfo[1] == 1062 || str_contains($e->getMessage(), 'unique constraint')) {
+                return response()->json([
+                    'message' => 'You are already subscribed to reminders for this event.'
+                ], 409); // Conflict
+            }
+            throw $e;
+        }
+
+        return response()->json([
+            'message' => 'Reminder set successfully! We will notify you when sales open.'
+        ], 201);
+    }
+
     /**
      * Show public event details.
      */
@@ -74,11 +109,8 @@ class PublicEventController extends Controller
             ->firstOrFail();
 
         // Optionally, hide draft events from public view
-        if ($event->status === 'draft') {
-            // In a real scenario, maybe we check if a preview token exists.
-            // For now, let's just return it or 404. 
-            // Let's allow it for development, but ideally, only 'published' should be public.
-        }
+        // For now, we allow accessing drafts via direct URL for preview purposes.
+        // if ($event->status === 'draft') { ... }
 
         return response()->json([
             'tenant' => [

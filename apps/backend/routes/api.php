@@ -84,6 +84,7 @@ Route::get('/tenants/{slug}', [\App\Http\Controllers\TenantController::class, 's
 Route::middleware('waiting_room')->group(function () {
     Route::get('/public/events', [\App\Http\Controllers\PublicEventController::class, 'index']);
     Route::get('/public/tenants/{tenantSlug}/events/{eventSlug}', [\App\Http\Controllers\PublicEventController::class, 'show']);
+    Route::post('/public/tenants/{tenantSlug}/events/{eventSlug}/remind', [\App\Http\Controllers\PublicEventController::class, 'remind']);
 });
 
 // Waiting Room API

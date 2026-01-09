@@ -58,12 +58,18 @@ class EventController extends Controller
             'end_date' => 'required|date|after:start_date',
             'venue_name' => 'required|string',
             'venue_address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'leaderboard_config' => 'nullable|array',
+            'description' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
+            'facilities' => 'nullable|string',
+            'social_media' => 'nullable|array',
+            'status' => 'required|in:draft,published',
         ]);
 
         $event = Event::create([
             ...$validated,
-            'status' => 'draft',
             'tenant_id' => $user->tenant_id,
         ]);
 
@@ -88,8 +94,14 @@ class EventController extends Controller
             'end_date' => 'sometimes|date|after:start_date',
             'venue_name' => 'sometimes|string',
             'venue_address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'status' => 'sometimes|in:draft,published,ended',
             'leaderboard_config' => 'nullable|array',
+            'description' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
+            'facilities' => 'nullable|string',
+            'social_media' => 'nullable|array',
         ]);
 
         $event->update($validated);

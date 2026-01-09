@@ -4,20 +4,49 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, MapPinIcon, TicketIcon, Share2Icon, BellIcon } from "lucide-react";
+import { CalendarIcon, MapPinIcon, TicketIcon, Share2Icon, BellIcon, ExternalLinkIcon, InstagramIcon, GlobeIcon } from "lucide-react";
 import Image from "next/image";
 import TicketSelection from "./TicketSelection";
 import { Metadata } from 'next';
 import TenantHeader from "@/components/tenant/TenantHeader";
 import TenantFooter from "@/components/tenant/TenantFooter";
+import ShareButton from "@/components/public/ShareButton";
+import RemindMeButton from "@/components/public/RemindMeButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string, eventSlug: string }> }): Promise<Metadata> {
     const { slug, eventSlug } = await params;
     const data = await getPublicEvent(slug, eventSlug);
     if (!data) return { title: 'Event Not Found' };
+
+    const eventBanner = data.event.banner_url || '';
+    const eventDescription = data.event.description || `Get your tickets for ${data.event.name} now!`;
+    const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tukutix.com'}/${slug}/e/${eventSlug}`;
+
     return {
         title: `${data.event.name} | ${data.tenant.name}`,
-        description: data.event.description || `Get your tickets for ${data.event.name} now!`,
+        description: eventDescription,
+        openGraph: {
+            title: data.event.name,
+            description: eventDescription,
+            url: eventUrl,
+            siteName: 'Tukutix',
+            images: [
+                {
+                    url: eventBanner,
+                    width: 1200,
+                    height: 630,
+                    alt: data.event.name,
+                },
+            ],
+            type: 'website',
+            locale: 'id_ID',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: data.event.name,
+            description: eventDescription,
+            images: [eventBanner],
+        },
     };
 }
 
@@ -98,20 +127,42 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
                                     <div className="text-xl font-black text-zinc-900 leading-tight">
                                         {event.venue_name}
                                     </div>
-                                    <div className="text-sm text-zinc-500 mt-1 font-medium">
-                                        {event.venue_address || 'Check back for exact location details'}
-                                    </div>
+                                    {event.latitude && event.longitude ? (
+                                        <div className="mt-2">
+                                            <div className="text-sm text-zinc-500 font-medium mb-2">
+                                                {event.venue_address}
+                                            </div>
+                                            <a
+                                                href={`https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-bold rounded-lg transition-colors group"
+                                            >
+                                                <MapPinIcon className="w-4 h-4" />
+                                                Open in Google Maps
+                                                <ExternalLinkIcon className="w-3 h-3 ml-0.5 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm text-zinc-500 mt-1 font-medium">
+                                            {event.venue_address || 'Check back for exact location details'}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex gap-4 md:justify-end">
-                            <Button variant="outline" size="lg" className="rounded-2xl border-2 font-bold gap-2 text-zinc-700 border-zinc-200">
-                                <Share2Icon className="w-4 h-4" /> Share
-                            </Button>
-                            <Button variant="outline" size="lg" className="rounded-2xl border-2 font-bold gap-2 text-zinc-700 border-zinc-200">
-                                <BellIcon className="w-4 h-4" /> Remind Me
-                            </Button>
+                            <ShareButton
+                                eventName={event.name}
+                                eventDescription={event.description}
+                                className="rounded-2xl border-2 font-bold gap-2 text-zinc-700 border-zinc-200"
+                            />
+                            <RemindMeButton
+                                tenantSlug={slug}
+                                eventSlug={eventSlug}
+                                className="rounded-2xl border-2 font-bold gap-2 text-zinc-700 border-zinc-200"
+                            />
                         </div>
                     </div>
                 </div>
@@ -120,14 +171,34 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
             {/* Tickets & Content */}
             <main className="max-w-7xl mx-auto px-6 -mt-12 mb-24 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
 
-                {/* Left column: Ticket Selection */}
+                {/* Left column: Content & Tickets */}
                 <div className="lg:col-span-2 space-y-12">
-
-
                     <TicketSelection
                         tickets={event.ticket_types}
                         primaryColor={tenant.branding?.primary_color}
                     />
+
+                    {/* Description */}
+                    {event.description && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-black text-zinc-900">About this Event</h2>
+                            <div className="prose prose-zinc dark:prose-invert max-w-none text-zinc-600" dangerouslySetInnerHTML={{ __html: event.description }} />
+                        </div>
+                    )}
+
+                    {/* Facilities */}
+                    {event.facilities && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-black text-zinc-900">Facilities</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {event.facilities.split(',').map((facility: string, index: number) => (
+                                    <Badge key={index} variant="secondary" className="px-3 py-1.5 text-sm font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200">
+                                        {facility.trim()}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right column: Info & Sidebar */}
@@ -137,14 +208,32 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
                             <CardTitle className="text-lg font-black uppercase tracking-tight text-zinc-900">Terms & Conditions</CardTitle>
                         </CardHeader>
                         <CardContent className="p-8 space-y-4 text-zinc-600 text-sm leading-relaxed">
-                            <p>All sales are final. No refunds or exchanges except as provided in the Event Organizer&apos;s policy.</p>
-                            <p>Please ensure you enter your email correctly. E-tickets will be sent to the email provided during checkout.</p>
+                            {event.terms_and_conditions ? (
+                                <div className="prose prose-sm prose-zinc dark:prose-invert max-w-none text-zinc-600" dangerouslySetInnerHTML={{ __html: event.terms_and_conditions }} />
+                            ) : (
+                                <>
+                                    <p>All sales are final. No refunds or exchanges except as provided in the Event Organizer&apos;s policy.</p>
+                                    <p>Please ensure you enter your email correctly. E-tickets will be sent to the email provided during checkout.</p>
+                                </>
+                            )}
                             <div className="pt-4 border-t border-zinc-200">
                                 <div className="text-[11px] font-black uppercase text-zinc-400 tracking-wider mb-2">Organizer</div>
                                 <div className="text-zinc-900 font-bold">{tenant.name}</div>
-                                <Link href={`/${tenant.slug}`} className="inline-flex items-center gap-1 text-amber-600 text-xs font-bold mt-2 hover:underline">
-                                    View Profile &rarr;
-                                </Link>
+                                <div className="flex items-center gap-3 mt-3">
+                                    <Link href={`/${tenant.slug}`} className="inline-flex items-center gap-1 text-amber-600 text-xs font-bold hover:underline">
+                                        View Profile &rarr;
+                                    </Link>
+                                    {event.social_media?.instagram && (
+                                        <a href={event.social_media.instagram} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-pink-600 transition-colors">
+                                            <InstagramIcon className="w-5 h-5" />
+                                        </a>
+                                    )}
+                                    {event.social_media?.website && (
+                                        <a href={event.social_media.website} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-blue-600 transition-colors">
+                                            <GlobeIcon className="w-5 h-5" />
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

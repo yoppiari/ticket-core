@@ -13,10 +13,16 @@ class Event extends Model
     protected $fillable = [
         'name',
         'slug',
+        'description',
+        'terms_and_conditions',
+        'facilities',
+        'social_media',
         'start_date',
         'end_date',
         'venue_name',
         'venue_address',
+        'latitude',
+        'longitude',
         'status',
         'tenant_id',
         'leaderboard_config',
@@ -29,6 +35,9 @@ class Event extends Model
         'end_date' => 'datetime',
         'seat_map_layout' => 'array',
         'leaderboard_config' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'social_media' => 'array',
     ];
 
     public function tenant()
@@ -49,6 +58,11 @@ class Event extends Model
     public function addons()
     {
         return $this->hasMany(Addon::class);
+    }
+
+    public function reminders()
+    {
+        return $this->hasMany(EventReminder::class);
     }
 
     public function leaderboards()
