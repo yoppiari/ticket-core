@@ -31,7 +31,10 @@ export default function AddonManager({ eventId }: { eventId: string }) {
         try {
             const token = localStorage.getItem('auth_token');
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/events/${eventId}/addons`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
             });
             if (res.ok) {
                 const data = await res.json();
@@ -82,7 +85,10 @@ export default function AddonManager({ eventId }: { eventId: string }) {
             const token = localStorage.getItem('auth_token');
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/addons/${id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
             });
 
             if (res.ok) {
@@ -122,7 +128,8 @@ export default function AddonManager({ eventId }: { eventId: string }) {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });

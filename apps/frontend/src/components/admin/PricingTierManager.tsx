@@ -42,7 +42,10 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/ticket-types/${ticketType.id}/pricing-tiers`,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    },
                 }
             );
             if (res.ok) {
@@ -80,6 +83,7 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
+                    "Accept": "application/json",
                 },
                 body: JSON.stringify(payload),
             });
@@ -107,9 +111,16 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
         const token = localStorage.getItem("auth_token");
         await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/pricing-tiers/${id}`, {
             method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' },
         });
-        fetchTiers();
+
+        if (res.ok) {
+            fetchTiers();
+        } else {
+            const text = await res.text();
+            console.error("Delete failed:", res.status, text);
+            alert("Delete failed: " + text);
+        }
     };
 
     // Initial Load
