@@ -8,7 +8,7 @@ interface Ticket {
     ticket_code: string;
     status: string; // valid, used, revoked
     checked_in_at?: string | null;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
     event_id: string;
 }
 
@@ -32,7 +32,7 @@ const dbPromise = typeof window !== 'undefined' ? openDB(DB_NAME, DB_VERSION, {
             db.createObjectStore('logs', { keyPath: 'id' });
         }
     },
-}) : Promise.resolve(null as any);
+}) : Promise.resolve(null as unknown as import('idb').IDBPDatabase<unknown>);
 
 export async function saveTickets(tickets: Ticket[]) {
     const db = await dbPromise;

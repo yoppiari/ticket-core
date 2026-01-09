@@ -47,7 +47,11 @@ class CheckoutApiTest extends TestCase
         // 2. Checkout
         $response = $this->actingAs($user)->postJson("/api/public/events/test-event/checkout", [
             'seat_ids' => [$seat->id],
-            'addons' => []
+            'addons' => [],
+            'buyer_name' => 'John Doe',
+            'buyer_email' => 'john@example.com',
+            'buyer_whatsapp' => '1234567890',
+            'delivery_method' => 'email'
         ]);
 
         $response->assertStatus(201)
@@ -87,7 +91,11 @@ class CheckoutApiTest extends TestCase
 
         $response = $this->actingAs($user)->postJson("/api/public/events/test-event/checkout", [
             'seat_ids' => [$seat->id],
-            'addons' => []
+            'addons' => [],
+            'buyer_name' => 'John Doe',
+            'buyer_email' => 'john@example.com',
+            'buyer_whatsapp' => '1234567890',
+            'delivery_method' => 'email'
         ]);
 
         $response->assertStatus(422)
@@ -123,7 +131,11 @@ class CheckoutApiTest extends TestCase
             'seat_ids' => [$seat->id],
             'addons' => [
                 $addon->id => 2 // 2 parking spots = 1000
-            ]
+            ],
+            'buyer_name' => 'John Doe',
+            'buyer_email' => 'john@example.com',
+            'buyer_whatsapp' => '1234567890',
+            'delivery_method' => 'email'
         ]);
 
         $response->assertStatus(201);

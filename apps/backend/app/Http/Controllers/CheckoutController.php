@@ -41,6 +41,7 @@ class CheckoutController extends Controller
         $userId = auth()->id() ?? Session::getId();
 
         // 6-3 Affiliate Logic
+        $affiliateId = null;
         $refCode = $request->cookie('affiliate_ref') ?? $request->query('ref');
 
         if ($refCode) {

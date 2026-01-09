@@ -29,7 +29,7 @@ export default function LocationPicker({ latitude, longitude, onLocationChange, 
         if (!mapContainerRef.current || mapInstanceRef.current) return;
 
         // Fix for default marker icon
-        // @ts-ignore
+        // @ts-expect-error -- Fixing default icon path issue in Leaflet
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
             iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',

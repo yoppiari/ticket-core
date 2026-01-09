@@ -97,7 +97,7 @@ test.describe('Ticket Purchase Flow', () => {
         // We now use the accessibility buttons injected into Shadow DOM
         const seatBtn = page.getByTestId('seat-A1');
         await seatBtn.waitFor();
-        await seatBtn.evaluate((node: any) => node.click());
+        await seatBtn.evaluate((node: HTMLElement) => node.click());
 
         // 4. Reserve
         await page.getByRole('button', { name: 'Reserve Now' }).click();

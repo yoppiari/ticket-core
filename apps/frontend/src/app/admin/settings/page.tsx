@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +20,14 @@ function CardContent({ children, className }: { children: React.ReactNode; class
 }
 
 export default function TenantSettingsPage() {
+    return (
+        <Suspense fallback={<div className="p-10 text-center">Loading settings...</div>}>
+            <TenantSettingsContent />
+        </Suspense>
+    );
+}
+
+function TenantSettingsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [user, setUser] = useState<any>(null);
@@ -329,7 +337,7 @@ export default function TenantSettingsPage() {
                             <CardHeader><CardTitle>Bank Details</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-zinc-500 mb-4 bg-yellow-50 text-yellow-800 p-3 rounded border border-yellow-200">
-                                    These details will be used for processing your withdrawal requests. Ensure they match the Tenant Owner's legal identity.
+                                    These details will be used for processing your withdrawal requests. Ensure they match the Tenant Owner&apos;s legal identity.
                                 </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>

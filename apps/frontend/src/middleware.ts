@@ -27,7 +27,7 @@ export default async function middleware(req: NextRequest) {
     // 3. Check if it's a subdomain
 
     const currentHost = hostname.replace(/:\d+$/, ""); // Remove port
-    const rootDomain = "localhost"; // TODO: Make this env var (NEXT_PUBLIC_ROOT_DOMAIN)
+    // const rootDomain = "localhost"; // Unused
 
     // If we are on the root domain (e.g. landing page or app login), do nothing (or rewrite to /home)
     // But here we need to detect SUBDOMAIN.

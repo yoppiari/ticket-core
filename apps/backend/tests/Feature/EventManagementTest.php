@@ -27,6 +27,7 @@ class EventManagementTest extends TestCase
             'end_date' => now()->addDays(12)->toDateTimeString(),
             'venue_name' => 'Main Stadium',
             'venue_address' => '123 Stadium Rd',
+            'status' => 'draft',
         ];
 
         $response = $this->postJson('/api/admin/events', $payload);
@@ -55,6 +56,7 @@ class EventManagementTest extends TestCase
             'start_date' => now()->addDays(10)->toDateTimeString(),
             'end_date' => now()->addDays(9)->toDateTimeString(), // Invalid: Before start
             'venue_name' => 'Venue',
+            'status' => 'draft',
         ];
 
         $response = $this->postJson('/api/admin/events', $payload);

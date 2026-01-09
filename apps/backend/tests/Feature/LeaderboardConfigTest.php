@@ -26,6 +26,7 @@ class LeaderboardConfigTest extends TestCase
             'start_date' => now()->addDays(10)->toDateTimeString(),
             'end_date' => now()->addDays(12)->toDateTimeString(),
             'venue_name' => 'Arena',
+            'status' => 'draft',
             'leaderboard_config' => [
                 'points_per_ticket' => 10,
                 'points_per_referral' => 50,
@@ -59,6 +60,7 @@ class LeaderboardConfigTest extends TestCase
             'start_date' => now()->addDay(),
             'end_date' => now()->addDays(2),
             'venue_name' => 'V',
+            'status' => 'draft',
             'leaderboard_config' => "STRING NOT ARRAY"
         ]);
 

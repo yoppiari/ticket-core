@@ -109,7 +109,7 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure?")) return;
         const token = localStorage.getItem("auth_token");
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/pricing-tiers/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/pricing-tiers/${id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' },
         });

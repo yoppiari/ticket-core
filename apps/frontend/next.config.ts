@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const withPWA = require("@ducanh2912/next-pwa").default({
+const withPWA = require("@ducanh2912/next-pwa").default({ // eslint-disable-line @typescript-eslint/no-require-imports
   dest: "public",
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
@@ -13,6 +13,7 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: "standalone",
 };
 
 export default withPWA(nextConfig);

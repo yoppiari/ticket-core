@@ -31,7 +31,7 @@ class ScannerApiTest extends TestCase
             'status' => 'valid'
         ]);
 
-        $gateStaff = User::factory()->create();
+        $gateStaff = User::factory()->create(['tenant_id' => $tenant->id]);
 
         $response = $this->actingAs($gateStaff)->getJson("/api/scanner/events/{$event->id}/tickets");
 
@@ -55,7 +55,7 @@ class ScannerApiTest extends TestCase
             'status' => 'valid'
         ]);
 
-        $gateStaff = User::factory()->create();
+        $gateStaff = User::factory()->create(['tenant_id' => $tenant->id]);
 
         $logs = [
             [

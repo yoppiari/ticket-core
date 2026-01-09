@@ -18,7 +18,7 @@ class TenantCreationTest extends TestCase
     {
         // 1. Arrange: Create Admin User (acting as system admin)
         $admin = User::factory()->create([
-            'role' => 'admin' // Assuming we rely on role column
+            'role' => 'system_admin' // Assuming we rely on role column
         ]);
 
         Sanctum::actingAs($admin);
@@ -64,7 +64,7 @@ class TenantCreationTest extends TestCase
     /** @test */
     public function slug_must_be_unique()
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'system_admin']);
         Sanctum::actingAs($admin);
 
         Tenant::create([

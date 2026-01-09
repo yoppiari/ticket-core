@@ -51,14 +51,20 @@ class DashboardController extends Controller
             ->where('item_type', 'seat')
             ->sum('quantity');
 
+        // Mock usage for testing/demo purposes
+        $mockUsage = $request->query('mock_usage');
+        $usage = $mockUsage !== null ? (int) $mockUsage : $ticketsSold;
+
+        $limit = $tenant->plan_limit;
+        $percent = $limit > 0 ? round(($usage / $limit) * 100, 1) : 0;
+
         return response()->json([
             'events_count' => $eventsCount,
             'total_sales' => $totalSales,
             'tickets_sold' => $ticketsSold,
-            // Keep old fields just in case useful later, or remove if strict.
-            // 'limit' => $tenant->plan_limit,
-            // 'usage' => $ticketsSold,
-            // 'percent' => $tenant->plan_limit > 0 ? round(($ticketsSold / $tenant->plan_limit) * 100, 1) : 0,
+            'limit' => $limit,
+            'usage' => $usage,
+            'percent' => $percent,
         ]);
     }
 }

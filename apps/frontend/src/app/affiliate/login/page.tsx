@@ -112,7 +112,7 @@ export default function AffiliateLoginPage() {
                     </button>
 
                     <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                        Don't have an affiliate account?{' '}
+                        Don&apos;t have an affiliate account?{' '}
                         <Link href="/affiliate/register" className="text-blue-600 hover:text-blue-500 font-semibold">
                             Join Now
                         </Link>

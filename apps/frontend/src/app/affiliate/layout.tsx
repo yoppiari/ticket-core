@@ -7,12 +7,13 @@ import Link from 'next/link';
 export default function AffiliateLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
-    const [authorized, setAuthorized] = useState(false);
+    const isPublic = pathname === '/affiliate/login' || pathname === '/affiliate/register';
+    const [authorized, setAuthorized] = useState(isPublic);
 
     useEffect(() => {
-        // Skip auth check for login and register pages
-        if (pathname === '/affiliate/login' || pathname === '/affiliate/register') {
-            setAuthorized(true);
+        // Skip auth check for login and register pages if already authorized
+        if (isPublic) {
+            if (!authorized) setTimeout(() => setAuthorized(true), 0);
             return;
         }
 
@@ -39,8 +40,10 @@ export default function AffiliateLayout({ children }: { children: React.ReactNod
             return;
         }
 
-        setAuthorized(true);
-    }, [pathname, router]);
+        if (!authorized) {
+            setTimeout(() => setAuthorized(true), 0);
+        }
+    }, [pathname, router, authorized]);
 
     // Show loading or nothing while checking auth (except for public pages)
     if (!authorized && pathname !== '/affiliate/login' && pathname !== '/affiliate/register') {

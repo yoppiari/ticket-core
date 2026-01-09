@@ -70,7 +70,7 @@ export default function RemindMeButton({
                 disabled
             >
                 <BellIcon className="w-4 h-4 mr-2" />
-                You're on the list!
+                You&apos;re on the list!
             </Button>
         );
     }
@@ -94,7 +94,7 @@ export default function RemindMeButton({
                         <div className="p-6 border-b border-zinc-100">
                             <h3 className="text-lg font-bold text-zinc-900">Get Notified</h3>
                             <p className="text-sm text-zinc-500 mt-1">
-                                We'll send you an email when tickets become available.
+                                We&apos;ll send you an email when tickets become available.
                             </p>
                         </div>
 
