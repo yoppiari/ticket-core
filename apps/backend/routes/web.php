@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +11,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\SpaController;
+use Illuminate\Support\Facades\Route;
+
+// Serve SPA frontend
+Route::get('/', [SpaController::class, 'index']);
+
+// Catch-all route for SPA client-side routing (except API routes)
+Route::get('/{path}', [SpaController::class, 'catchAll'])->where('path', '^(?!api).*');
+
+Route::get('/{path}', function ($path) {
+    return file_get_contents(public_path('spa/index.html'));
+})->where('path', '^(?!api).*');

@@ -15,7 +15,6 @@ NC='\033[0m' # No Color
 # PID file locations
 BACKEND_PID_FILE=".backend.pid"
 FRONTEND_PID_FILE=".frontend.pid"
-DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 # Print colored output
 print_status() {
@@ -58,12 +57,7 @@ cleanup() {
         rm -f "$FRONTEND_PID_FILE"
     fi
 
-    # Stop Docker services
-    if [ -f "$DOCKER_COMPOSE_FILE" ]; then
-        print_status "Stopping Docker services..."
-        docker compose down 2>/dev/null || true
-        print_success "Docker services stopped"
-    fi
+    # No Docker services to stop (using external services)
 
     print_success "All services stopped"
     exit 0
@@ -100,25 +94,13 @@ if ! command -v composer &> /dev/null; then
     print_warning "Composer is not installed. Laravel backend might not work properly."
 fi
 
-# Start Docker services
-print_status "Starting Docker services (PostgreSQL, Redis, Mailpit)..."
-docker compose up -d
-
-# Wait for services to be ready
-print_status "Waiting for Docker services to be ready..."
-sleep 3
-
-# Check if services are running
-if ! docker compose ps | grep -q "postgres"; then
-    print_error "PostgreSQL failed to start"
-    exit 1
+# Check for external services configuration
+if [ ! -f ".env" ]; then
+    print_warning "No .env file found. Please configure external services first."
+    print_status "Copy .env.external to .env and configure your services."
 fi
 
-print_success "Docker services started"
-print_status "  PostgreSQL: localhost:5440"
-print_status "  Redis: localhost:6380"
-print_status "  Mailpit UI: http://localhost:8025"
-print_status "  Mailpit SMTP: localhost:1025"
+print_status "Using external services (PostgreSQL, Redis, Email)..."
 
 # Kill any processes on required ports
 print_status "Cleaning up application ports..."
@@ -229,16 +211,15 @@ echo "📊 Application URLs:"
 echo "   Frontend:     http://localhost:3002"
 echo "   Backend API:  http://localhost:8000/api"
 echo ""
-echo "🗄️  Database & Services:"
-echo "   PostgreSQL:   localhost:5440 (user: postgres, db: ticketing)"
-echo "   Redis:        localhost:6380"
-echo "   Mailpit UI:   http://localhost:8025"
-echo "   Mailpit SMTP: localhost:1025"
+echo "🗄️  External Services:"
+echo "   PostgreSQL:   Configured in .env"
+echo "   Redis:        Configured in .env"
+echo "   Email:        Configured in .env"
 echo ""
 echo "📝 Logs:"
 echo "   Backend:      tail -f backend.log"
 echo "   Frontend:     tail -f frontend.log"
-echo "   Docker:       docker compose logs -f"
+echo "   Docker:       N/A (using external services)"
 echo ""
 echo "🛠️  Commands:"
 echo "   Stop:         Press Ctrl+C"

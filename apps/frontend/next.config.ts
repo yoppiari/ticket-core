@@ -13,7 +13,13 @@ const withPWA = require("@ducanh2912/next-pwa").default({ // eslint-disable-line
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: "standalone",
+  output: "export",
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+  // Handle dynamic routes for static export
+  generateBuildId: () => 'build',
 };
 
 export default withPWA(nextConfig);
