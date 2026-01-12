@@ -34,7 +34,17 @@ export default function ScannerLoginPage() {
             });
 
             if (!res.ok) {
-                throw new Error('Invalid credentials');
+                let msg = 'Invalid credentials';
+                try {
+                    const errData = await res.json();
+                    msg = errData.message || msg;
+                    if (errData.errors && errData.errors.email) {
+                        msg = errData.errors.email[0];
+                    }
+                } catch (e) {
+                    msg = `Error ${res.status}: ${res.statusText}`;
+                }
+                throw new Error(msg);
             }
 
             const data = await res.json();
@@ -47,7 +57,8 @@ export default function ScannerLoginPage() {
 
             router.push('/scanner/scan');
         } catch (err: any) {
-            setError(err.message);
+            console.error('Login error:', err);
+            setError(err.message || 'Login failed');
         } finally {
             setLoading(false);
         }

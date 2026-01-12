@@ -17,13 +17,22 @@ class AuthController extends Controller
             'device_name' => 'nullable|string',
         ]);
 
+        \Illuminate\Support\Facades\Log::info('Login Attempt', ['email' => $request->email]);
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            \Illuminate\Support\Facades\Log::warning('Login Failed', [
+                'email' => $request->email,
+                'user_exists' => (bool) $user,
+                'hash_check' => $user ? Hash::check($request->password, $user->password) : false
+            ]);
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
         }
+
+        \Illuminate\Support\Facades\Log::info('Login Success', ['email' => $request->email]);
 
         // Revoke all tokens if creating a fresh session? 
         // Or allowing multiple devices. Standard is allow multiple.
