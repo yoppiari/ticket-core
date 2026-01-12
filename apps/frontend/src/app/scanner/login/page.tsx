@@ -21,7 +21,10 @@ export default function ScannerLoginPage() {
             // Assuming we have a global auth helper or just hit API directly.
             // Let's hit the backend directly for MVP.
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+            const endpoint = apiUrl ? `${apiUrl}/login` : '/api/login';
+
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
