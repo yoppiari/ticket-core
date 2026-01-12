@@ -40,7 +40,9 @@ export default async function middleware(req: NextRequest) {
     const isSubdomain =
         currentHost !== "localhost" &&
         currentHost !== "www.localhost" &&
-        !currentHost.endsWith(".vercel.app"); // Adjust as needed
+        currentHost !== "tukutix.com" &&
+        currentHost !== "www.tukutix.com" &&
+        !currentHost.endsWith(".vercel.app");
 
     // Affiliate Logic: Check for ?ref=CODE
     // We want to capture it and set a cookie, then proceed.
