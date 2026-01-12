@@ -54,7 +54,7 @@ export default function ScannerLoginPage() {
         <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4">
             <div className="mb-8 text-center">
                 <div className="font-black text-2xl tracking-tighter text-white">SCANNER<span className="text-blue-500">APP</span></div>
-                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Staff Access Only</p>
+                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Authorized Access</p>
             </div>
 
             <div className="w-full max-w-sm bg-zinc-900 p-8 rounded-2xl shadow-2xl border border-zinc-800 ring-1 ring-white/5">
@@ -75,7 +75,7 @@ export default function ScannerLoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            placeholder="staff@example.com"
+                            placeholder="user@example.com"
                         />
                     </div>
 
