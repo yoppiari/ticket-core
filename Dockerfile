@@ -10,8 +10,8 @@ RUN npm ci
 COPY apps/frontend/ ./
 RUN npm run build
 # Copy static files to standalone
-RUN cp -r public .next/standalone/apps/frontend/public
-RUN cp -r .next/static .next/standalone/apps/frontend/.next/static
+RUN cp -r public .next/standalone/public
+RUN cp -r .next/static .next/standalone/.next/static
 
 # Backend stage
 FROM php:8.2-fpm
