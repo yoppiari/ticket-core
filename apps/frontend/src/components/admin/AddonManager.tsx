@@ -30,7 +30,7 @@ export default function AddonManager({ eventId }: { eventId: string }) {
     const fetchAddons = async () => {
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/events/${eventId}/addons`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/events/${eventId}/addons`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -83,7 +83,7 @@ export default function AddonManager({ eventId }: { eventId: string }) {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/addons/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/addons/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function AddonManager({ eventId }: { eventId: string }) {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const url = editingItem
                 ? `${baseUrl}/api/admin/addons/${editingItem.id}`
                 : `${baseUrl}/api/admin/events/${eventId}/addons`;

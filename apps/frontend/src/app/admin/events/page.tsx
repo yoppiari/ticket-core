@@ -23,7 +23,7 @@ export default function AdminEventsPage() {
     const fetchEvents = async () => {
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/events`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/events`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -51,7 +51,7 @@ export default function AdminEventsPage() {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/events/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/events/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -115,8 +115,8 @@ export default function AdminEventsPage() {
                                     <div className="flex items-center gap-3 mb-2">
                                         <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{event.name}</h3>
                                         <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded ${event.status === 'published' ? 'bg-green-100 text-green-700' :
-                                                event.status === 'draft' ? 'bg-amber-100 text-amber-700' :
-                                                    'bg-zinc-100 text-zinc-600'
+                                            event.status === 'draft' ? 'bg-amber-100 text-amber-700' :
+                                                'bg-zinc-100 text-zinc-600'
                                             }`}>
                                             {event.status}
                                         </span>

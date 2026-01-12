@@ -40,7 +40,7 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
         try {
             const token = localStorage.getItem("auth_token");
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/ticket-types/${ticketType.id}/pricing-tiers`,
+                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/ticket-types/${ticketType.id}/pricing-tiers`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -63,8 +63,8 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
         e.preventDefault();
         const token = localStorage.getItem("auth_token");
         const url = editingTier
-            ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/pricing-tiers/${editingTier.id}`
-            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/ticket-types/${ticketType.id}/pricing-tiers`;
+            ? `${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/pricing-tiers/${editingTier.id}`
+            : `${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/ticket-types/${ticketType.id}/pricing-tiers`;
 
         const method = editingTier ? "PUT" : "POST";
 
@@ -109,7 +109,7 @@ export default function PricingTierManager({ ticketType }: { ticketType: TicketT
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure?")) return;
         const token = localStorage.getItem("auth_token");
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/admin/pricing-tiers/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/pricing-tiers/${id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' },
         });

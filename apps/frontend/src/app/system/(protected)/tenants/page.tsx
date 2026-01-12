@@ -35,7 +35,7 @@ export default function SystemTenantsPage() {
         if (!token) return;
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/tenants`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/tenants`, {
                 headers: { Authorization: `Bearer ${token}`, Accept: "application/json" }
             });
             if (res.ok) setTenants(await res.json());
@@ -48,7 +48,7 @@ export default function SystemTenantsPage() {
         const token = localStorage.getItem("auth_token");
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/tenants`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/tenants`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

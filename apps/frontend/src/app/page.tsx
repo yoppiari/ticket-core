@@ -24,7 +24,7 @@ export default function LandingPage() {
   const { data: events, isLoading } = useQuery<Event[]>({
     queryKey: ["public-events"],
     queryFn: async (): Promise<Event[]> => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/public/events`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/public/events`);
       if (!res.ok) throw new Error("Failed to fetch events");
       return res.json();
     },

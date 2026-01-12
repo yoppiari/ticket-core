@@ -33,7 +33,7 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
     const fetchTicketTypes = async () => {
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/events/${eventId}/ticket-types`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/events/${eventId}/ticket-types`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -88,7 +88,7 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/ticket-types/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/ticket-types/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -114,7 +114,7 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
 
         try {
             const token = localStorage.getItem('auth_token');
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const url = editingItem
                 ? `${baseUrl}/api/admin/ticket-types/${editingItem.id}`
                 : `${baseUrl}/api/admin/events/${eventId}/ticket-types`;
