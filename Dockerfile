@@ -6,9 +6,12 @@ WORKDIR /app/frontend
 COPY apps/frontend/package*.json ./
 RUN npm ci
 
-# Copy frontend source and build
+# Copy source and build
 COPY apps/frontend/ ./
 RUN npm run build
+# Copy static files to standalone
+RUN cp -r public .next/standalone/apps/frontend/public
+RUN cp -r .next/static .next/standalone/apps/frontend/.next/static
 
 # Backend stage
 FROM php:8.2-fpm
@@ -25,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     nginx \
+    nodejs \
     supervisor
 
 # Clear cache
@@ -48,8 +52,9 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 # Copy backend application code
 COPY apps/backend/ ./
 
-# Copy built frontend from builder stage
-COPY --from=frontend-builder /app/frontend/out ./public/spa
+# Copy standalone build
+COPY --from=frontend-builder /app/frontend/.next/standalone ./frontend
+
 
 # Finish composer
 RUN composer dump-autoload --optimize

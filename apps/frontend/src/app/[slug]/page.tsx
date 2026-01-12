@@ -7,11 +7,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-// Allow dynamic params at runtime for static export
-export async function generateStaticParams() {
-    // Return empty array to allow any dynamic param at runtime
-    return [];
-}
+
 
 // Reusing the same function for both upcoming and past? Or just copying the card component
 // To keep it clean, let's just duplicate the list logic or create a small helper component in-file if it was bigger.
