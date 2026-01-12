@@ -9,10 +9,8 @@ import ReservationTimer from '@/components/cart/ReservationTimer';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// For static export, return empty params - this page renders at runtime
-export function generateStaticParams() {
-    return [];
-}
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
 
 export default function CheckoutPage() {
     const params = useParams();
