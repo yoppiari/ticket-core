@@ -7,7 +7,10 @@ import { Loader2 } from "lucide-react";
 import ClientRedirect from "./ClientRedirect";
 
 // Allow dynamic params at runtime for static export
-export const dynamicParams = true;
+export async function generateStaticParams() {
+    // Return empty array to allow any dynamic param at runtime
+    return [];
+}
 
 export default async function WaitingRoomPage({ params }: { params: Promise<{ slug: string, eventSlug: string }> }) {
     const { slug, eventSlug } = await params;

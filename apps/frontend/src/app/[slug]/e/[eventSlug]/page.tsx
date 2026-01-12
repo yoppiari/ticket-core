@@ -14,7 +14,10 @@ import ShareButton from "@/components/public/ShareButton";
 import RemindMeButton from "@/components/public/RemindMeButton";
 
 // Allow dynamic params at runtime for static export
-export const dynamicParams = true;
+export async function generateStaticParams() {
+    // Return empty array to allow any dynamic param at runtime
+    return [];
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string, eventSlug: string }> }): Promise<Metadata> {
     const { slug, eventSlug } = await params;
