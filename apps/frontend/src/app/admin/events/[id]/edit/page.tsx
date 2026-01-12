@@ -6,6 +6,9 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ExternalLinkIcon, EyeIcon, GlobeIcon, TrashIcon, XIcon, AlertTriangleIcon } from 'lucide-react';
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 const LocationPicker = dynamic(() => import('@/components/admin/LocationPicker'), {
     ssr: false,
     loading: () => <div className="h-[400px] w-full bg-zinc-100 animate-pulse rounded-xl"></div>

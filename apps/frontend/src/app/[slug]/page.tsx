@@ -7,6 +7,9 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 // Reusing the same function for both upcoming and past? Or just copying the card component
 // To keep it clean, let's just duplicate the list logic or create a small helper component in-file if it was bigger.
 // For now, I'll inline it but separate logic.

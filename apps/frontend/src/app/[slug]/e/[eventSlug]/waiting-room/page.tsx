@@ -6,6 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 import ClientRedirect from "./ClientRedirect";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 export default async function WaitingRoomPage({ params }: { params: Promise<{ slug: string, eventSlug: string }> }) {
     const { slug, eventSlug } = await params;
     const status = await getQueueStatus(eventSlug);

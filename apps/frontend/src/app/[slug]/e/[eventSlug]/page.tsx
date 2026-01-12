@@ -13,6 +13,9 @@ import TenantFooter from "@/components/tenant/TenantFooter";
 import ShareButton from "@/components/public/ShareButton";
 import RemindMeButton from "@/components/public/RemindMeButton";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string, eventSlug: string }> }): Promise<Metadata> {
     const { slug, eventSlug } = await params;
     const data = await getPublicEvent(slug, eventSlug);

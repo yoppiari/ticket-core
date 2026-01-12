@@ -5,6 +5,9 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 interface TicketType {
     id: string;
     name: string;

@@ -6,6 +6,9 @@ import Link from "next/link";
 import TicketTypeManager from "@/components/admin/TicketTypeManager";
 import AddonManager from "@/components/admin/AddonManager";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 export default function EditEventPage() {
     const { id } = useParams();
     const router = useRouter();

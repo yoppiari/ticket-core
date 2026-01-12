@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+// Allow dynamic params at runtime for static export
+export const dynamicParams = true;
+
 interface LeaderboardEntry {
     rank: number;
     name: string;
