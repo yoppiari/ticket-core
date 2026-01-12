@@ -20,7 +20,7 @@ interface SeatSelectionSectionProps {
     slug: string; // Need slug for routing
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function SeatSelectionSection({ slug, eventSlug, primaryColor }: SeatSelectionSectionProps) {
     const router = useRouter();

@@ -20,7 +20,7 @@ interface AddonSelectionProps {
     primaryColor?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function AddonSelection({ eventSlug, onSelectionChange, primaryColor }: AddonSelectionProps) {
     const [addons, setAddons] = useState<Addon[]>([]);

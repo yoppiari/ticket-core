@@ -32,7 +32,7 @@ export default function AffiliateMarketplacePage() {
         if (!token) return;
 
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${baseUrl}/api/affiliates/marketplace`, {
                 headers: {
                     'Accept': 'application/json',
@@ -68,7 +68,7 @@ export default function AffiliateMarketplacePage() {
 
     const fetchAffiliateCode = async () => {
         const token = localStorage.getItem('auth_token');
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
         try {
             const res = await fetch(`${baseUrl}/api/affiliates/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }

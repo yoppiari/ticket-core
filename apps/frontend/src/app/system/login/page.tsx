@@ -112,7 +112,7 @@ export default function SystemLoginPage() {
 
             <div className="mt-8 text-zinc-600 text-xs text-center w-full max-w-xs">
                 <p>Access to this system is monitored and logged.</p>
-                <p>IP Address: 127.0.0.1</p>
+                <p>IP Address: System</p>
             </div>
         </div>
     );

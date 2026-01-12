@@ -30,7 +30,7 @@ export default function RemindMeButton({
         setIsLoading(true);
 
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${baseUrl}/public/tenants/${tenantSlug}/events/${eventSlug}/remind`, {
                 method: 'POST',
                 headers: {

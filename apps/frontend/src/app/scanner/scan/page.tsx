@@ -148,7 +148,6 @@ export default function ScanPage() {
             if (res.ok) {
                 await markLogsSynced(logs.map(l => l.id));
                 updatePendingCount();
-                console.log("Synced successfully");
             }
         } catch (err) {
             console.error("Sync failed", err);

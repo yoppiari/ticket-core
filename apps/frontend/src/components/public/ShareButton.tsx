@@ -13,9 +13,9 @@ interface ShareButtonProps {
     className?: string;
 }
 
-export default function ShareButton({ 
-    eventName, 
-    eventDescription, 
+export default function ShareButton({
+    eventName,
+    eventDescription,
     url,
     variant = "outline",
     size = "lg",
@@ -38,7 +38,7 @@ export default function ShareButton({
                 return;
             } catch (error) {
                 // User cancelled or share failed, fallback to copy
-                console.log("Share failed or cancelled, falling back to copy", error);
+                // User cancelled or share failed, fallback to copy
             }
         }
 
@@ -53,9 +53,9 @@ export default function ShareButton({
     };
 
     return (
-        <Button 
-            variant={variant} 
-            size={size} 
+        <Button
+            variant={variant}
+            size={size}
             className={className}
             onClick={handleShare}
         >

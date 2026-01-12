@@ -25,7 +25,7 @@ export function UsageWidget() {
     useEffect(() => {
         async function fetchStats() {
             try {
-                const res = await fetch("http://localhost:8000/api/admin/dashboard/stats", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/dashboard/stats`, {
                     headers: {
                         // In a browser with cookies, this should send session automatically 
                         // IF configured correctly (SameSite/CORS).

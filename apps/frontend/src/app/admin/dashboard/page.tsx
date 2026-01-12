@@ -7,7 +7,7 @@ export default function AdminDashboardPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white">Dashboard</h1>
-                <p className="text-zinc-500 mt-2">Welcome back! Here's what's happening with your events.</p>
+                <p className="text-zinc-500 mt-2">Welcome back! Here&apos;s what&apos;s happening with your events.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -62,7 +62,7 @@ function StatsCard({ title, value, icon: Icon, trend, trendUp }: any) {
             </div>
             <div className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{value}</div>
             <div className={`text-xs flex items-center gap-1 ${trendUp === true ? 'text-green-600' :
-                    trendUp === false ? 'text-red-600' : 'text-zinc-500'
+                trendUp === false ? 'text-red-600' : 'text-zinc-500'
                 }`}>
                 <span>{trend}</span>
             </div>

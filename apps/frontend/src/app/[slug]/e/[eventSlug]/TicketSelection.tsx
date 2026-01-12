@@ -47,7 +47,7 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
         setIsCheckingOut(true);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/public/events/${params.eventSlug}/checkout`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/public/events/${params.eventSlug}/checkout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

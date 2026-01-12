@@ -59,7 +59,7 @@ export default function SystemFinancePage() {
         const token = localStorage.getItem("auth_token");
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/withdrawals/${id}/approve`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/withdrawals/${id}/approve`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}`, Accept: "application/json" }
             });
@@ -85,7 +85,7 @@ export default function SystemFinancePage() {
         const token = localStorage.getItem("auth_token");
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/withdrawals/${id}/reject`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/admin/withdrawals/${id}/reject`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
