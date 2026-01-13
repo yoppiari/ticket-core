@@ -20,6 +20,9 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
     const [showForm, setShowForm] = useState(false);
     const [editingItem, setEditingItem] = useState<TicketType | null>(null);
 
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
     // Form state
     const [formData, setFormData] = useState({
         name: '',
@@ -65,6 +68,8 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
             sale_start_date: '',
             sale_end_date: '',
         });
+        setImageFile(null);
+        setImagePreview(null);
         setEditingItem(null);
         setShowForm(false);
         setError('');
@@ -79,6 +84,9 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
             sale_start_date: item.sale_start_date ? new Date(item.sale_start_date).toISOString().slice(0, 16) : '',
             sale_end_date: item.sale_end_date ? new Date(item.sale_end_date).toISOString().slice(0, 16) : '',
         });
+        setImageFile(null);
+        // @ts-ignore - item has image_url from backend
+        setImagePreview(item.image_url || null);
         setEditingItem(item);
         setShowForm(true);
     };
@@ -108,6 +116,19 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
         }
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImageFile(file);
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -119,25 +140,37 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
                 ? `${baseUrl}/api/admin/ticket-types/${editingItem.id}`
                 : `${baseUrl}/api/admin/events/${eventId}/ticket-types`;
 
-            const method = editingItem ? 'PUT' : 'POST';
+            const method = 'POST'; // We use POST for both creation and updates (Laravel standard for file uploads usually requires POST with _method=PUT, or just POST for creation)
 
-            const payload = {
-                name: formData.name,
-                description: formData.description,
-                price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
-                sale_start_date: formData.sale_start_date || null,
-                sale_end_date: formData.sale_end_date || null,
-            };
+            // Actually, for update with file upload in Laravel/PHP, native PUT requests with multipart/form-data are problematic.
+            // It's safer to use POST and method spoofing for updates if needed, OR just POST if the endpoint allows.
+            // Our controller 'update' route is typically PUT/PATCH.
+            // Let's use POST with _method field for updates to handle file upload correctly.
+
+            const formDataObj = new FormData();
+            formDataObj.append('name', formData.name);
+            if (formData.description) formDataObj.append('description', formData.description);
+            formDataObj.append('price', formData.price);
+            formDataObj.append('stock', formData.stock);
+            if (formData.sale_start_date) formDataObj.append('sale_start_date', formData.sale_start_date);
+            if (formData.sale_end_date) formDataObj.append('sale_end_date', formData.sale_end_date);
+
+            if (imageFile) {
+                formDataObj.append('image', imageFile);
+            }
+
+            if (editingItem) {
+                formDataObj.append('_method', 'PUT');
+            }
 
             const res = await fetch(url, {
-                method,
+                method: 'POST', // Always POST when using FormData (with _method for PUT)
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
+                    // Do NOT set Content-Type, browser sets it for FormData
                 },
-                body: JSON.stringify(payload)
+                body: formDataObj
             });
 
             if (res.ok) {
@@ -145,7 +178,7 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
                 resetForm();
             } else {
                 const data = await res.json();
-                setError(data.message || 'Failed to save');
+                setError(data.message || 'Failed tosave');
             }
         } catch (err: any) {
             setError(err.message || 'Error executing request');
@@ -231,6 +264,26 @@ export default function TicketTypeManager({ eventId }: { eventId: string }) {
                                     value={formData.sale_end_date}
                                     onChange={e => setFormData({ ...formData, sale_end_date: e.target.value })}
                                 />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium mb-1">Ticket Image</label>
+                                <div className="flex gap-4 items-start">
+                                    <div className="flex-1">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="w-full p-2 border rounded dark:bg-zinc-800 dark:border-zinc-700 text-sm"
+                                        />
+                                        <p className="text-xs text-zinc-500 mt-1">Recommended size: 800x600px, Max 2MB</p>
+                                    </div>
+                                    {imagePreview && (
+                                        <div className="relative w-20 h-20 bg-zinc-200 rounded overflow-hidden flex-shrink-0">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className="flex justify-end gap-2 pt-2">
