@@ -41,9 +41,25 @@ class TicketTypeController extends Controller
             'stock' => 'required|integer|min:0',
             'sale_start_date' => 'nullable|date',
             'sale_end_date' => 'nullable|date|after:sale_start_date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $ticketType = $event->ticketTypes()->create($validated);
+        $data = $validated;
+        unset($data['image']);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
+            // Store in: storage/app/public/tenants/{tenant_slug}/events/{event_slug}/tickets/
+            $tenantSlug = $event->tenant->slug;
+            $eventSlug = $event->slug;
+            $path = "tenants/{$tenantSlug}/events/{eventSlug}/tickets";
+
+            $file->storeAs($path, $filename, 'public');
+            $data['image_url'] = "/{$path}/{$filename}";
+        }
+
+        $ticketType = $event->ticketTypes()->create($data);
 
         return response()->json($ticketType, 201);
     }
@@ -67,9 +83,31 @@ class TicketTypeController extends Controller
             'stock' => 'sometimes|integer|min:0',
             'sale_start_date' => 'nullable|date',
             'sale_end_date' => 'nullable|date|after:sale_start_date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $ticketType->update($validated);
+        $data = $validated;
+        unset($data['image']);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($ticketType->image_url && \Illuminate\Support\Facades\Storage::disk('public')->exists(ltrim($ticketType->image_url, '/'))) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete(ltrim($ticketType->image_url, '/'));
+            }
+
+            $file = $request->file('image');
+            $filename = \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+            $event = $ticketType->event;
+            $tenantSlug = $event->tenant->slug;
+            $eventSlug = $event->slug;
+            $path = "tenants/{$tenantSlug}/events/{eventSlug}/tickets";
+
+            $file->storeAs($path, $filename, 'public');
+            $data['image_url'] = "/{$path}/{$filename}";
+        }
+
+        $ticketType->update($data);
 
         return response()->json($ticketType);
     }
