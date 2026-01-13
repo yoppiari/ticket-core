@@ -21,36 +21,42 @@ class WaitingRoomMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Try to get event slug from route
-        $eventSlug = $request->route('eventSlug') ?? $request->route('event');
+        try {
+            // Try to get event slug from route
+            $eventSlug = $request->route('eventSlug') ?? $request->route('event');
 
-        // If no event context, skip
-        if (!$eventSlug) {
+            // If no event context, skip
+            if (!$eventSlug) {
+                return $next($request);
+            }
+
+            // Get or generate user token
+            $token = $this->waitingRoomService->getSessionToken();
+
+            // Check status
+            $status = $this->waitingRoomService->checkStatus($eventSlug, $token);
+
+            if ($status['status'] === 'waiting') {
+                return response()->json([
+                    'message' => 'Waiting Room',
+                    'status' => 'waiting',
+                    'position' => $status['position'],
+                    'total_waiting' => $status['total_waiting'],
+                ], 429)->withCookie(cookie('wr_token', $token, 1440));
+            }
+
+            // Add token to cookie if admitted
+            $response = $next($request);
+
+            if ($response instanceof \Illuminate\Http\Response || $response instanceof \Illuminate\Http\JsonResponse) {
+                $response->withCookie(cookie('wr_token', $token, 1440));
+            }
+
+            return $response;
+        } catch (\Throwable $e) {
+            // Safety net: If waiting room logic crashes, just let the user through
+            \Illuminate\Support\Facades\Log::error('Waiting Room Middleware Error: ' . $e->getMessage());
             return $next($request);
         }
-
-        // Get or generate user token
-        $token = $this->waitingRoomService->getSessionToken();
-
-        // Check status
-        $status = $this->waitingRoomService->checkStatus($eventSlug, $token);
-
-        if ($status['status'] === 'waiting') {
-            return response()->json([
-                'message' => 'Waiting Room',
-                'status' => 'waiting',
-                'position' => $status['position'],
-                'total_waiting' => $status['total_waiting'],
-            ], 429)->withCookie(cookie('wr_token', $token, 1440));
-        }
-
-        // Add token to cookie if admitted
-        $response = $next($request);
-
-        if ($response instanceof \Illuminate\Http\Response || $response instanceof \Illuminate\Http\JsonResponse) {
-            $response->withCookie(cookie('wr_token', $token, 1440));
-        }
-
-        return $response;
     }
 }
