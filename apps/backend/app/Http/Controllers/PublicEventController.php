@@ -7,6 +7,8 @@ use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
+use Illuminate\Support\Facades\Log;
+
 class PublicEventController extends Controller
 {
     /**
@@ -99,32 +101,45 @@ class PublicEventController extends Controller
 
     public function show($tenantSlug, $eventSlug)
     {
-        $tenant = Tenant::where('slug', $tenantSlug)->firstOrFail();
+        try {
+            $tenant = Tenant::where('slug', $tenantSlug)->firstOrFail();
 
-        $event = Event::where('tenant_id', $tenant->id)
-            ->where('slug', $eventSlug)
-            ->with([
-                'ticketTypes' => function ($query) {
-                    // We show all ticket types, the frontend will handle "Coming Soon" or "Sold Out"
-                    // But we could also use the available scope if we only want to show currently sellable ones.
-                    // For now, let's include all so users see what's coming.
-                },
-                'addons'
-            ])
-            ->firstOrFail();
+            $event = Event::where('tenant_id', $tenant->id)
+                ->where('slug', $eventSlug)
+                ->with([
+                    'ticketTypes' => function ($query) {
+                        // We show all ticket types, the frontend will handle "Coming Soon" or "Sold Out"
+                        // But we could also use the available scope if we only want to show currently sellable ones.
+                        // For now, let's include all so users see what's coming.
+                    },
+                    'addons'
+                ])
+                ->firstOrFail();
 
-        // Optionally, hide draft events from public view
-        // For now, we allow accessing drafts via direct URL for preview purposes.
-        // if ($event->status === 'draft') { ... }
+            // Optionally, hide draft events from public view
+            // For now, we allow accessing drafts via direct URL for preview purposes.
+            // if ($event->status === 'draft') { ... }
 
-        return response()->json([
-            'tenant' => [
-                'name' => $tenant->name,
-                'slug' => $tenant->slug,
-                'branding' => $tenant->branding ?? [], // Default to empty array
-            ],
-            'event' => $event,
-            'settings' => $tenant->settings ?? [], // Default to empty array
-        ]);
+            return response()->json([
+                'tenant' => [
+                    'name' => $tenant->name,
+                    'slug' => $tenant->slug,
+                    'branding' => $tenant->branding ?? [], // Default to empty array
+                ],
+                'event' => $event,
+                'settings' => $tenant->settings ?? [], // Default to empty array
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error showing public event: ' . $e->getMessage(), [
+                'tenant' => $tenantSlug,
+                'event' => $eventSlug,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An unexpected error occurred while loading the event.',
+                'debug_message' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
     }
 }

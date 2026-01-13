@@ -56,11 +56,20 @@ COPY apps/backend/ ./
 COPY --from=frontend-builder /app/frontend/.next/standalone ./frontend
 
 
+# Ensure directories exist
+RUN mkdir -p storage/app/public
+RUN mkdir -p public
+
+# Create storage link (remove existing one first if it exists from host)
+RUN rm -f public/storage
+RUN ln -s /var/www/storage/app/public /var/www/public/storage
+
 # Finish composer
 RUN composer dump-autoload --optimize
 
 # Permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public
+RUN chmod -R 755 /var/www/storage /var/www/public
 
 # Configure nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
