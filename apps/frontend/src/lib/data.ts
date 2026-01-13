@@ -1,9 +1,16 @@
-
-const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || '';
+function getBaseUrl() {
+    if (typeof window !== 'undefined') {
+        return process.env.NEXT_PUBLIC_API_URL || '';
+    }
+    // Server-side
+    return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1';
+}
 
 export async function getTenant(slug: string) {
     try {
-        const res = await fetch(`${API_URL}/api/tenants/${slug}`, {
+        const baseUrl = getBaseUrl();
+        console.log(`[getTenant] Fetching from: ${baseUrl}/api/tenants/${slug}`); // Debug log
+        const res = await fetch(`${baseUrl}/api/tenants/${slug}`, {
             cache: 'no-store'
         });
 
@@ -21,7 +28,8 @@ export async function getTenant(slug: string) {
 
 export async function getPublicEvent(tenantSlug: string, eventSlug: string) {
     try {
-        const res = await fetch(`${API_URL}/api/public/tenants/${tenantSlug}/events/${eventSlug}`, {
+        const baseUrl = getBaseUrl();
+        const res = await fetch(`${baseUrl}/api/public/tenants/${tenantSlug}/events/${eventSlug}`, {
             cache: 'no-store'
         });
 
@@ -45,7 +53,8 @@ export async function getPublicEvent(tenantSlug: string, eventSlug: string) {
 
 export async function getQueueStatus(eventSlug: string) {
     try {
-        const res = await fetch(`${API_URL}/api/public/events/${eventSlug}/queue-status`, { cache: 'no-store' });
+        const baseUrl = getBaseUrl();
+        const res = await fetch(`${baseUrl}/api/public/events/${eventSlug}/queue-status`, { cache: 'no-store' });
         if (!res.ok) return null;
         return res.json();
     } catch (e) {
@@ -55,7 +64,8 @@ export async function getQueueStatus(eventSlug: string) {
 
 export async function sendHeartbeat(eventSlug: string) {
     try {
-        const res = await fetch(`${API_URL}/api/public/events/${eventSlug}/heartbeat`, {
+        const baseUrl = getBaseUrl();
+        const res = await fetch(`${baseUrl}/api/public/events/${eventSlug}/heartbeat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -67,7 +77,8 @@ export async function sendHeartbeat(eventSlug: string) {
 
 export async function getTenantEvents(tenantSlug: string, timeframe: 'upcoming' | 'past' | 'all' = 'upcoming') {
     try {
-        const res = await fetch(`${API_URL}/api/public/events?tenant_slug=${tenantSlug}&timeframe=${timeframe}`, {
+        const baseUrl = getBaseUrl();
+        const res = await fetch(`${baseUrl}/api/public/events?tenant_slug=${tenantSlug}&timeframe=${timeframe}`, {
             cache: 'no-store'
         });
 
