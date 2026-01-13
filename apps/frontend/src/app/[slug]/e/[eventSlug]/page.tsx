@@ -13,6 +13,9 @@ import TenantFooter from "@/components/tenant/TenantFooter";
 import ShareButton from "@/components/public/ShareButton";
 import RemindMeButton from "@/components/public/RemindMeButton";
 
+// Allow dynamic params at runtime
+export const dynamic = 'force-dynamic';
+
 // Allow dynamic params at runtime for static export
 export async function generateStaticParams() {
     // Return empty array to allow any dynamic param at runtime
@@ -76,7 +79,7 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
     const { slug, eventSlug } = await params;
     const data = await getPublicEvent(slug, eventSlug);
 
-    if (!data) {
+    if (!data || !data.tenant || !data.event) {
         return notFound();
     }
 
