@@ -29,7 +29,7 @@ class EventController extends Controller
         $user = $request->user();
 
         // Tenant Scope Check
-        if ($event->tenant_id !== $user->tenant_id) {
+        if ($user->role !== 'super_admin' && $event->tenant_id !== $user->tenant_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -65,7 +65,7 @@ class EventController extends Controller
             'terms_and_conditions' => 'nullable|string',
             'facilities' => 'nullable|string',
             'social_media' => 'nullable|array',
-            'social_media' => 'nullable|array',
+
             'status' => 'required|in:draft,published',
             // Affiliate Settings
             'affiliate_enabled' => 'nullable|boolean',
@@ -89,7 +89,7 @@ class EventController extends Controller
         $user = $request->user();
 
         // Tenant Scope Check
-        if ($event->tenant_id !== $user->tenant_id) {
+        if ($user->role !== 'super_admin' && $event->tenant_id !== $user->tenant_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -125,7 +125,7 @@ class EventController extends Controller
         $user = $request->user();
 
         // Tenant Scope Check
-        if ($event->tenant_id !== $user->tenant_id) {
+        if ($user->role !== 'super_admin' && $event->tenant_id !== $user->tenant_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
