@@ -17,9 +17,16 @@ interface Event {
     start_date: string;
     end_date: string;
     location: string;
+    venue_name?: string;
+    venue_address?: string;
+    latitude?: number;
+    longitude?: number;
     banner_url: string;
     status: 'draft' | 'published' | 'ended' | 'cancelled';
     tenant_slug?: string;
+    terms_and_conditions?: string;
+    facilities?: string;
+    social_media?: any[];
 }
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,9 +63,15 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                     description: eventData.description || '',
                     start_date: eventData.start_date ? new Date(eventData.start_date).toISOString().slice(0, 16) : '',
                     end_date: eventData.end_date ? new Date(eventData.end_date).toISOString().slice(0, 16) : '',
-                    location: eventData.location || '',
+                    venue_name: eventData.venue_name || '',
+                    venue_address: eventData.venue_address || '',
+                    latitude: eventData.latitude,
+                    longitude: eventData.longitude,
                     status: eventData.status,
-                    banner_url: eventData.banner_url || ''
+                    banner_url: eventData.banner_url || '',
+                    terms_and_conditions: eventData.terms_and_conditions || '',
+                    facilities: eventData.facilities || '',
+                    social_media: eventData.social_media || []
                 });
             } else {
                 alert('Failed to load event');
@@ -135,7 +148,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-                    {['Details', 'Tickets', 'Add-ons'].map((tab) => (
+                    {['Details', 'Location', 'Content', 'Tickets', 'Add-ons'].map((tab) => (
                         <TabsTrigger
                             key={tab}
                             value={tab.toLowerCase().replace(' ', '-')}
@@ -147,6 +160,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                 </TabsList>
 
                 <div className="mt-6">
+                    {/* General Details Tab */}
                     <TabsContent value="details">
                         <form onSubmit={handleUpdate} className="max-w-2xl space-y-6 bg-white dark:bg-zinc-950 p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <div className="space-y-4">
@@ -168,15 +182,6 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                                         className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 font-mono text-sm"
                                         value={formData.slug || ''}
                                         onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Description</label>
-                                    <textarea
-                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-32"
-                                        value={formData.description || ''}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
                                     />
                                 </div>
 
@@ -204,20 +209,6 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Location</label>
-                                    <div className="relative">
-                                        <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
-                                        <input
-                                            type="text"
-                                            required
-                                            className="w-full pl-9 p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
-                                            value={formData.location || ''}
-                                            onChange={e => setFormData({ ...formData, location: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
                                     <label className="block text-sm font-medium mb-1">Status</label>
                                     <select
                                         className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
@@ -236,6 +227,124 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                                 <Button type="submit" disabled={saving} className="bg-black text-white hover:bg-zinc-800">
                                     {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                                     Save Changes
+                                </Button>
+                            </div>
+                        </form>
+                    </TabsContent>
+
+                    {/* Location Tab */}
+                    <TabsContent value="location">
+                        <form onSubmit={handleUpdate} className="max-w-2xl space-y-6 bg-white dark:bg-zinc-950 p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Venue Name</label>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
+                                        <input
+                                            type="text"
+                                            required
+                                            className="w-full pl-9 p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            value={formData.venue_name || ''}
+                                            onChange={e => setFormData({ ...formData, venue_name: e.target.value })}
+                                            placeholder="e.g. Jakarta Convention Center"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Venue Address</label>
+                                    <textarea
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-24"
+                                        value={formData.venue_address || ''}
+                                        onChange={e => setFormData({ ...formData, venue_address: e.target.value })}
+                                        placeholder="Full address of the venue"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Latitude</label>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            value={formData.latitude || ''}
+                                            onChange={e => setFormData({ ...formData, latitude: parseFloat(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Longitude</label>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            value={formData.longitude || ''}
+                                            onChange={e => setFormData({ ...formData, longitude: parseFloat(e.target.value) })}
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-zinc-500">
+                                    Get these coordinates from Google Maps (right click on a location).
+                                </p>
+                            </div>
+                            <div className="pt-4 border-t dark:border-zinc-800 flex justify-end">
+                                <Button type="submit" disabled={saving} className="bg-black text-white hover:bg-zinc-800">
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                    Save Location
+                                </Button>
+                            </div>
+                        </form>
+                    </TabsContent>
+
+                    {/* Content & Media Tab */}
+                    <TabsContent value="content">
+                        <form onSubmit={handleUpdate} className="max-w-2xl space-y-6 bg-white dark:bg-zinc-950 p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Banner URL</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                        value={formData.banner_url || ''}
+                                        onChange={e => setFormData({ ...formData, banner_url: e.target.value })}
+                                        placeholder="https://..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Description</label>
+                                    <textarea
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-32"
+                                        value={formData.description || ''}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Event description..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Terms & Conditions</label>
+                                    <textarea
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-32"
+                                        value={formData.terms_and_conditions || ''}
+                                        onChange={e => setFormData({ ...formData, terms_and_conditions: e.target.value })}
+                                        placeholder="Terms and conditions..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Facilities</label>
+                                    <textarea
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-24"
+                                        value={formData.facilities || ''}
+                                        onChange={e => setFormData({ ...formData, facilities: e.target.value })}
+                                        placeholder="Parking, WiFi, Toilet, etc..."
+                                    />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t dark:border-zinc-800 flex justify-end">
+                                <Button type="submit" disabled={saving} className="bg-black text-white hover:bg-zinc-800">
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                    Save Content
                                 </Button>
                             </div>
                         </form>

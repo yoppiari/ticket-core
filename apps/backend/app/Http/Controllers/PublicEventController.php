@@ -121,10 +121,10 @@ class PublicEventController extends Controller
             'tenant' => [
                 'name' => $tenant->name,
                 'slug' => $tenant->slug,
-                'branding' => $tenant->branding,
+                'branding' => $tenant->branding ?? [], // Default to empty array
             ],
             'event' => $event,
-            'settings' => $tenant->settings, // Expose settings so frontend knows if past events should be shown
+            'settings' => $tenant->settings ?? [], // Default to empty array
         ]);
     }
 }
