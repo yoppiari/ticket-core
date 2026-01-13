@@ -20,40 +20,56 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string, eventSlug: string }> }): Promise<Metadata> {
-    const { slug, eventSlug } = await params;
-    const data = await getPublicEvent(slug, eventSlug);
-    if (!data) return { title: 'Event Not Found' };
+    try {
+        const { slug, eventSlug } = await params;
+        const data = await getPublicEvent(slug, eventSlug);
 
-    const eventBanner = data.event.banner_url || '';
-    const eventDescription = data.event.description || `Get your tickets for ${data.event.name} now!`;
-    const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://tukutix.com'}/${slug}/e/${eventSlug}`;
+        if (!data || !data.event || !data.tenant) {
+            return {
+                title: 'Event Not Found',
+                description: 'The requested event could not be found.'
+            };
+        }
 
-    return {
-        title: `${data.event.name} | ${data.tenant.name}`,
-        description: eventDescription,
-        openGraph: {
-            title: data.event.name,
+        const eventBanner = data.event.banner_url || '';
+        const eventDescription = data.event.description || `Get your tickets for ${data.event.name} now!`;
+        // Use a fallback for APP_URL that is safe
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tukutix.com';
+        const eventUrl = `${appUrl}/${slug}/e/${eventSlug}`;
+
+        return {
+            title: `${data.event.name} | ${data.tenant.name}`,
             description: eventDescription,
-            url: eventUrl,
-            siteName: 'Tukutix',
-            images: [
-                {
-                    url: eventBanner,
-                    width: 1200,
-                    height: 630,
-                    alt: data.event.name,
-                },
-            ],
-            type: 'website',
-            locale: 'id_ID',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: data.event.name,
-            description: eventDescription,
-            images: [eventBanner],
-        },
-    };
+            openGraph: {
+                title: data.event.name,
+                description: eventDescription,
+                url: eventUrl,
+                siteName: 'Tukutix',
+                images: eventBanner ? [
+                    {
+                        url: eventBanner,
+                        width: 1200,
+                        height: 630,
+                        alt: data.event.name,
+                    },
+                ] : [],
+                type: 'website',
+                locale: 'id_ID',
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title: data.event.name,
+                description: eventDescription,
+                images: eventBanner ? [eventBanner] : [],
+            },
+        };
+    } catch (error) {
+        console.error('Error generating metadata:', error);
+        return {
+            title: 'Tukutix Event',
+            description: 'Event details'
+        };
+    }
 }
 
 export default async function EventLandingPage({ params }: { params: Promise<{ slug: string, eventSlug: string }> }) {
