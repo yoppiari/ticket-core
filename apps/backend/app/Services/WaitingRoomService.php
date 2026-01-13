@@ -31,47 +31,49 @@ class WaitingRoomService
      */
     public function checkStatus(string $eventId, string $token): array
     {
-        $this->cleanupActiveUsers($eventId);
+        try {
+            $this->cleanupActiveUsers($eventId);
 
-        $limit = config('ticketing.waiting_room_limit', 1000);
-        $activeKey = "{$this->prefix}:{$eventId}:active";
+            $limit = config('ticketing.waiting_room_limit', 1000);
+            $activeKey = "{$this->prefix}:{$eventId}:active";
 
-        // 1. Is user already active?
-        if (Redis::zscore($activeKey, $token) !== null) {
-            // Update heartbeat
-            Redis::zadd($activeKey, time(), $token);
-            return ['status' => 'admitted'];
-        }
+            // 1. Is user already active?
+            if (Redis::zscore($activeKey, $token) !== null) {
+                // Update heartbeat
+                Redis::zadd($activeKey, time(), $token);
+                return ['status' => 'admitted'];
+            }
 
-        // 2. Is there room? (And no one is waiting)
-        $waitingListKey = "{$this->prefix}:{$eventId}:waiting_list";
-        $activeCount = Redis::zcard($activeKey);
-        $waitingCount = Redis::zcard($waitingListKey);
+            // 2. Is there room? (And no one is waiting)
+            $waitingListKey = "{$this->prefix}:{$eventId}:waiting_list";
+            $activeCount = Redis::zcard($activeKey);
+            $waitingCount = Redis::zcard($waitingListKey);
 
-        if ($activeCount < $limit && $waitingCount === 0) {
-            // Admit user
-            Redis::zadd($activeKey, time(), $token);
-            return ['status' => 'admitted'];
-        }
+            if ($activeCount < $limit && $waitingCount === 0) {
+                // Admit user
+                Redis::zadd($activeKey, time(), $token);
+                return ['status' => 'admitted'];
+            }
 
-        // 3. User is waiting. Add to queue if not already there.
-        // Note: Finding position in List is expensive, but we check if they are in queue.
-        // Simple strategy: If they aren't active, they are "waiting".
-        // Actually, let's use a Sorted Set for waiting too to avoid duplicates easily.
-
-        $waitingListKey = "{$this->prefix}:{$eventId}:waiting_list";
-        $position = Redis::zrank($waitingListKey, $token);
-
-        if ($position === null) {
-            Redis::zadd($waitingListKey, time(), $token);
+            // 3. User is waiting. Add to queue if not already there.
+            $waitingListKey = "{$this->prefix}:{$eventId}:waiting_list";
             $position = Redis::zrank($waitingListKey, $token);
-        }
 
-        return [
-            'status' => 'waiting',
-            'position' => $position + 1,
-            'total_waiting' => Redis::zcard($waitingListKey)
-        ];
+            if ($position === null) {
+                Redis::zadd($waitingListKey, time(), $token);
+                $position = Redis::zrank($waitingListKey, $token);
+            }
+
+            return [
+                'status' => 'waiting',
+                'position' => $position + 1,
+                'total_waiting' => Redis::zcard($waitingListKey)
+            ];
+        } catch (\Exception $e) {
+            // Fail open: If Redis fails, just admit the user to avoid 500 errors
+            \Illuminate\Support\Facades\Log::error('Waiting Room Redis Error: ' . $e->getMessage());
+            return ['status' => 'admitted'];
+        }
     }
 
     /**
