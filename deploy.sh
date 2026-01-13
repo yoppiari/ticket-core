@@ -52,6 +52,7 @@ build_and_run() {
         -e APP_URL=${APP_URL:-"https://tukutix.com"} \
         -e NEXT_PUBLIC_API_URL=${APP_URL:-"https://tukutix.com"} \
         -e ASSET_URL=${ASSET_URL:-"https://tukutix.com"} \
+        -v ticketing_storage:/var/www/storage/app/public \
         -p 8081:80 \
         $REGISTRY/ticket-app:$VERSION
 }
