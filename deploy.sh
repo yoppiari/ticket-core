@@ -39,6 +39,9 @@ build_and_run() {
         -e MAIL_PASSWORD=${MAIL_PASSWORD} \
         -e MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls} \
         -e MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS} \
+        -e APP_URL=${APP_URL:-"https://tukutix.com"} \
+        -e NEXT_PUBLIC_API_URL=${APP_URL:-"https://tukutix.com"} \
+        -e ASSET_URL=${ASSET_URL:-"https://tukutix.com"} \
         -p 80:80 \
         $REGISTRY/ticket-app:$VERSION
 }
