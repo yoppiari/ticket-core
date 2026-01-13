@@ -8,6 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TicketTypeManager from '@/components/admin/TicketTypeManager';
 import AddonManager from '@/components/admin/AddonManager';
+import dynamic from 'next/dynamic';
+
+const LocationPicker = dynamic(() => import('@/components/admin/LocationPicker'), {
+    ssr: false,
+    loading: () => <div className="h-[400px] w-full bg-zinc-100 animate-pulse rounded-xl" />
+});
 
 interface Event {
     id: string;
@@ -236,29 +242,43 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                     <TabsContent value="location">
                         <form onSubmit={handleUpdate} className="max-w-2xl space-y-6 bg-white dark:bg-zinc-950 p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Venue Name</label>
-                                    <div className="relative">
-                                        <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
+                                <LocationPicker
+                                    latitude={formData.latitude}
+                                    longitude={formData.longitude}
+                                    initialAddress={formData.venue_address}
+                                    onLocationChange={(lat, lng, address) => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            latitude: lat,
+                                            longitude: lng,
+                                            // Only update address if one is returned from the map search/click
+                                            ...(address ? { venue_address: address } : {})
+                                        }));
+                                    }}
+                                />
+
+                                <div className="grid grid-cols-2 gap-4 pt-4 border-t dark:border-zinc-800">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Venue Name</label>
                                         <input
                                             type="text"
                                             required
-                                            className="w-full pl-9 p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
                                             value={formData.venue_name || ''}
                                             onChange={e => setFormData({ ...formData, venue_name: e.target.value })}
                                             placeholder="e.g. Jakarta Convention Center"
                                         />
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Venue Address</label>
-                                    <textarea
-                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 h-24"
-                                        value={formData.venue_address || ''}
-                                        onChange={e => setFormData({ ...formData, venue_address: e.target.value })}
-                                        placeholder="Full address of the venue"
-                                    />
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Venue Address</label>
+                                        <input
+                                            type="text"
+                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            value={formData.venue_address || ''}
+                                            onChange={e => setFormData({ ...formData, venue_address: e.target.value })}
+                                            placeholder="Full address of the venue"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -267,9 +287,9 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                                         <input
                                             type="number"
                                             step="any"
-                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            readOnly
+                                            className="w-full p-2 bg-zinc-50 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 text-zinc-500"
                                             value={formData.latitude || ''}
-                                            onChange={e => setFormData({ ...formData, latitude: parseFloat(e.target.value) })}
                                         />
                                     </div>
                                     <div>
@@ -277,15 +297,12 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                                         <input
                                             type="number"
                                             step="any"
-                                            className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                            readOnly
+                                            className="w-full p-2 bg-zinc-50 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 text-zinc-500"
                                             value={formData.longitude || ''}
-                                            onChange={e => setFormData({ ...formData, longitude: parseFloat(e.target.value) })}
                                         />
                                     </div>
                                 </div>
-                                <p className="text-xs text-zinc-500">
-                                    Get these coordinates from Google Maps (right click on a location).
-                                </p>
                             </div>
                             <div className="pt-4 border-t dark:border-zinc-800 flex justify-end">
                                 <Button type="submit" disabled={saving} className="bg-black text-white hover:bg-zinc-800">
