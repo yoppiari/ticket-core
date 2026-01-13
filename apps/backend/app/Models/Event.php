@@ -84,11 +84,15 @@ class Event extends Model
             return $value;
         }
 
+        $appUrl = config('app.url') ?? url('/');
+        // Remove trailing slash if present
+        $appUrl = rtrim($appUrl, '/');
+
         if (str_starts_with($value, '/')) {
-            return url('storage' . $value);
+            return $appUrl . '/storage' . $value;
         }
 
-        return url('storage/' . $value);
+        return $appUrl . '/storage/' . $value;
     }
 
     public function getCapacityAttribute()

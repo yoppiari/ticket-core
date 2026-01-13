@@ -26,6 +26,26 @@ class TicketType extends Model
         'sale_end_date' => 'datetime',
     ];
 
+    public function getImageUrlAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+
+        $appUrl = config('app.url') ?? url('/');
+        $appUrl = rtrim($appUrl, '/');
+
+        if (str_starts_with($value, '/')) {
+            return $appUrl . '/storage' . $value;
+        }
+
+        return $appUrl . '/storage/' . $value;
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);
