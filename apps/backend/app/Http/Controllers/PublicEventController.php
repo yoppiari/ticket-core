@@ -129,6 +129,10 @@ class PublicEventController extends Controller
                 'event' => $event,
                 'settings' => $tenant->settings ?? [], // Default to empty array
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         } catch (\Throwable $e) {
             Log::error('Error showing public event: ' . $e->getMessage(), [
                 'tenant' => $tenantSlug,

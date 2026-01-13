@@ -8,6 +8,8 @@ RUN npm ci
 
 # Copy source and build
 COPY apps/frontend/ ./
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 # Copy static files to standalone
 RUN cp -r public .next/standalone/public

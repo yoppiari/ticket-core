@@ -15,7 +15,11 @@ echo "Version: $VERSION"
 # Function to build and run application
 build_and_run() {
     echo "Building application (backend + frontend SPA)..."
-    docker build -t $REGISTRY/ticket-app:$VERSION .
+    # Ensure APP_URL is set for build time
+    APP_URL=${APP_URL:-"https://tukutix.com"}
+    docker build \
+        --build-arg NEXT_PUBLIC_API_URL=$APP_URL \
+        -t $REGISTRY/ticket-app:$VERSION .
     
     if [ ! -z "$PUSH_REGISTRY" ]; then
         echo "Pushing to registry..."
@@ -44,6 +48,7 @@ build_and_run() {
         -e MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls} \
         -e MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS} \
         -e LOG_CHANNEL=stderr \
+        -e API_URL="http://127.0.0.1" \
         -e APP_URL=${APP_URL:-"https://tukutix.com"} \
         -e NEXT_PUBLIC_API_URL=${APP_URL:-"https://tukutix.com"} \
         -e ASSET_URL=${ASSET_URL:-"https://tukutix.com"} \
