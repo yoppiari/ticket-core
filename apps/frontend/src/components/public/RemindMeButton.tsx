@@ -31,7 +31,7 @@ export default function RemindMeButton({
 
         try {
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${baseUrl}/public/tenants/${tenantSlug}/events/${eventSlug}/remind`, {
+            const res = await fetch(`${baseUrl}/api/public/tenants/${tenantSlug}/events/${eventSlug}/remind`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
