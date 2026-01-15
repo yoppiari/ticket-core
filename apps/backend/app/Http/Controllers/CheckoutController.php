@@ -18,7 +18,9 @@ class CheckoutController extends Controller
 
     public function store(Request $request, $eventSlug)
     {
-        $event = Event::where('slug', $eventSlug)->firstOrFail();
+        $event = Event::where('slug', $eventSlug)
+            ->where('status', 'published')
+            ->firstOrFail();
 
         $validated = $request->validate([
             'seat_ids' => 'sometimes|array',

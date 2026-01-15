@@ -106,6 +106,7 @@ class PublicEventController extends Controller
 
             $event = Event::where('tenant_id', $tenant->id)
                 ->where('slug', $eventSlug)
+                ->where('status', 'published')
                 ->with([
                     'ticketTypes' => function ($query) {
                         // We show all ticket types, the frontend will handle "Coming Soon" or "Sold Out"

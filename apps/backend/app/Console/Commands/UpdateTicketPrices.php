@@ -29,38 +29,36 @@ class UpdateTicketPrices extends Command
     {
         $this->info('Starting price update...');
 
-        $ticketTypes = TicketType::with(['pricingTiers'])->get();
         $updatedCount = 0;
 
-        foreach ($ticketTypes as $ticketType) {
-            $currentPrice = $ticketType->price;
+        // Use chunk to prevent memory leaks with large datasets
+        TicketType::with(['pricingTiers'])->chunk(100, function ($ticketTypes) use (&$updatedCount) {
+            foreach ($ticketTypes as $ticketType) {
+                $currentPrice = $ticketType->price;
+                $now = now();
 
-            // Find best active tier
-            $activeTier = $ticketType->pricingTiers
-                ->filter(function ($tier) {
-                    $now = now();
-                    $starts = $tier->starts_at ? $tier->starts_at <= $now : true;
-                    $ends = $tier->ends_at ? $tier->ends_at >= $now : true;
+                // Find best active tier
+                // Logic: Active date range AND highest priority (lowest number)
+                $activeTier = $ticketType->pricingTiers
+                    ->filter(function ($tier) use ($now) {
+                        $starts = $tier->starts_at ? $tier->starts_at <= $now : true;
+                        $ends = $tier->ends_at ? $tier->ends_at >= $now : true;
+                        return $starts && $ends;
+                    })
+                    ->sortBy('priority') // Lower priority number = Higher priority
+                    ->first();
 
-                    // TODO: Check quantity_limit vs sold count if implemented
-    
-                    return $starts && $ends;
-                })
-                ->sortBy('priority') // Lower priority number = Higher priority (0 first)
-                ->first();
-
-            if ($activeTier) {
-                if ($activeTier->price != $currentPrice) {
-                    $ticketType->update(['price' => $activeTier->price]);
-                    $this->line("Updated {$ticketType->name}: {$currentPrice} -> {$activeTier->price} ({$activeTier->name})");
-                    $updatedCount++;
+                if ($activeTier) {
+                    if ($activeTier->price != $currentPrice) {
+                        $ticketType->update(['price' => $activeTier->price]);
+                        $this->line("Updated {$ticketType->name}: {$currentPrice} -> {$activeTier->price} ({$activeTier->name})");
+                        $updatedCount++;
+                    }
                 }
-            } else {
-                // Optional: Revert to some base price or log?
-                // For now, do nothing.
-                //$this->warn("No active tier for {$ticketType->name}");
+                // Note: If no active tier, we retain the current price. 
+                // To revert to base price, a 'base_price' column would be needed in schema.
             }
-        }
+        });
 
         $this->info("Prices updated. Total changed: {$updatedCount}");
     }
