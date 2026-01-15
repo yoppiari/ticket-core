@@ -89,7 +89,7 @@ class CheckoutService
             // 3. Process Addons
             if (!empty($addonSelections)) {
                 $addonIds = array_keys($addonSelections);
-                $addons = Addon::whereIn('id', $addonIds)->get();
+                $addons = Addon::whereIn('id', $addonIds)->lockForUpdate()->get();
 
                 foreach ($addons as $addon) {
                     $qty = $addonSelections[$addon->id];
@@ -97,6 +97,8 @@ class CheckoutService
                         if ($addon->stock < $qty) {
                             throw new \Exception("Addon {$addon->name} has insufficient stock.");
                         }
+
+                        $addon->decrement('stock', $qty);
 
                         $subtotal = $addon->price * $qty;
                         $totalAmount += $subtotal;

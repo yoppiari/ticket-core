@@ -31,4 +31,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'swanqris' => [
+        'base_url' => env('SWANQRIS_BASE_URL'),
+        'merchant_id' => env('SWANQRIS_MERCHANT_ID'),
+        'sub_merchant_id' => env('SWANQRIS_SUB_MERCHANT_ID'),
+        'store_id' => env('SWANQRIS_STORE_ID'),
+        'email' => env('SWANQRIS_EMAIL'),
+        'password' => env('SWANQRIS_PASSWORD'),
+        'api_key' => env('SWANQRIS_API_KEY'),
+        'client_secret' => env('SWANQRIS_CLIENT_SECRET'),
+        'kode_loket' => env('SWANQRIS_KODE_LOKET'),
+        'partner_id' => env('SWANQRIS_PARTNER_ID'),
+        'mock_mode' => env('SWANQRIS_MOCK_MODE', false),
+    ],
+
 ];

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\PaymentGatewayInterface;
 use App\Models\Order;
 use App\Services\Gateways\MockGateway;
+use App\Services\Gateways\SwanQrisGateway;
 // use App\Services\Gateways\XenditGateway; // Future
 
 class PaymentService
@@ -25,11 +26,14 @@ class PaymentService
 
         // Simple factory logic based on config
         // In real app, bind this in AppServiceProvider
-        $driver = config('ticketing.payment.default', 'mock');
+        $driver = config('ticketing.payment.default', env('PAYMENT_DRIVER', 'mock'));
 
         switch ($driver) {
             case 'mock':
                 $this->gateway = new MockGateway();
+                break;
+            case 'swanqris':
+                $this->gateway = new SwanQrisGateway();
                 break;
             // case 'xendit': ...
             default:

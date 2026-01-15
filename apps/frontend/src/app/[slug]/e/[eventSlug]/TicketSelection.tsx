@@ -28,6 +28,16 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
     const router = useRouter();
     const [quantities, setQuantities] = useState<Record<string, number>>({});
     const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [showBuyerForm, setShowBuyerForm] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Buyer Details State
+    const [buyerDetails, setBuyerDetails] = useState({
+        name: '',
+        whatsapp: '',
+        email: '',
+        delivery_method: 'email' // default
+    });
 
     const updateQuantity = (ticketId: string, delta: number, max: number) => {
         setQuantities(prev => {
@@ -42,9 +52,15 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
         return total + (ticket.price * (quantities[ticket.id] || 0));
     }, 0);
 
-    const handleCheckout = async () => {
+    const handleCheckoutClick = () => {
         if (totalTickets === 0) return;
+        setShowBuyerForm(true);
+    };
+
+    const submitCheckout = async (e: React.FormEvent) => {
+        e.preventDefault();
         setIsCheckingOut(true);
+        setError(null);
 
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/public/events/${params.eventSlug}/checkout`, {
@@ -55,6 +71,10 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
                 },
                 body: JSON.stringify({
                     tickets: quantities,
+                    buyer_name: buyerDetails.name,
+                    buyer_whatsapp: buyerDetails.whatsapp,
+                    buyer_email: buyerDetails.email,
+                    delivery_method: buyerDetails.delivery_method
                 }),
                 credentials: 'include',
             });
@@ -70,8 +90,7 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            alert(error instanceof Error ? error.message : 'Failed to start checkout');
-        } finally {
+            setError(error instanceof Error ? error.message : 'Failed to start checkout');
             setIsCheckingOut(false);
         }
     };
@@ -190,7 +209,7 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
             </div>
 
             {/* Checkbar / Floating Action */}
-            <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-transform duration-300 z-50 ${totalTickets > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
+            <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-transform duration-300 z-40 ${totalTickets > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                     <div className="flex flex-col">
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Payment</div>
@@ -202,22 +221,95 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
                         size="lg"
                         className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all gap-2"
                         style={{ backgroundColor: primaryColor }}
-                        onClick={handleCheckout}
+                        onClick={handleCheckoutClick}
                         disabled={isCheckingOut}
                     >
-                        {isCheckingOut ? (
-                            <span>Processing...</span>
-                        ) : (
-                            <>
-                                <span>Checkout</span>
-                                <ShoppingCartIcon className="w-4 h-4" />
-                            </>
-                        )}
+                        <span>Checkout</span>
+                        <ShoppingCartIcon className="w-4 h-4" />
                     </Button>
                 </div>
             </div>
+
             {/* Spacer for floating bar */}
             {totalTickets > 0 && <div className="h-24"></div>}
+
+            {/* Buyer Details Modal */}
+            {showBuyerForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 p-6 md:p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Buyer Details</h3>
+                            <Button variant="ghost" size="sm" onClick={() => setShowBuyerForm(false)} className="rounded-full h-8 w-8 p-0">
+                                <span className="sr-only">Close</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                            </Button>
+                        </div>
+
+                        {error && (
+                            <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-bold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={submitCheckout} className="space-y-4">
+                            <div className="space-y-2">
+                                <label htmlFor="name" className="text-sm font-bold text-slate-700">Full Name</label>
+                                <input
+                                    id="name"
+                                    type="text"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all"
+                                    placeholder="Enter your full name"
+                                    value={buyerDetails.name}
+                                    onChange={e => setBuyerDetails({ ...buyerDetails, name: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="whatsapp" className="text-sm font-bold text-slate-700">WhatsApp Number</label>
+                                <input
+                                    id="whatsapp"
+                                    type="tel"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all"
+                                    placeholder="e.g. 081234567890"
+                                    value={buyerDetails.whatsapp}
+                                    onChange={e => setBuyerDetails({ ...buyerDetails, whatsapp: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="text-sm font-bold text-slate-700">Email Address</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all"
+                                    placeholder="ticket@example.com"
+                                    value={buyerDetails.email}
+                                    onChange={e => setBuyerDetails({ ...buyerDetails, email: e.target.value })}
+                                />
+                                <p className="text-xs text-slate-400">E-tickets will be sent to this email.</p>
+                            </div>
+
+                            <div className="pt-4 flex gap-3">
+                                <Button type="button" variant="ghost" className="flex-1 rounded-xl font-bold" onClick={() => setShowBuyerForm(false)}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="flex-1 rounded-xl font-bold shadow-lg"
+                                    style={{ backgroundColor: primaryColor }}
+                                    disabled={isCheckingOut}
+                                >
+                                    {isCheckingOut ? 'Processing...' : 'Continue to Payment'}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

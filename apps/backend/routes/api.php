@@ -110,3 +110,8 @@ Route::prefix('public/events/{eventSlug}')->group(function () {
 Route::get('/embed/leaderboards/{id}', [\App\Http\Controllers\LeaderboardController::class, 'embed']);
 
 Route::post('/webhooks/payment/{provider}', [\App\Http\Controllers\WebhookController::class, 'handle']);
+
+// SwanQRIS Callbacks
+Route::post('/b2b/token', [\App\Http\Controllers\SwanQrisCallbackController::class, 'getToken']);
+Route::post('/qris/notify', [\App\Http\Controllers\SwanQrisCallbackController::class, 'notify']);
+

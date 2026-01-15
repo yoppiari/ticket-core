@@ -34,7 +34,7 @@ class PaymentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'redirect_url' => $paymentData['redirect_url']
+                'data' => $paymentData
             ]);
         } catch (\Exception $e) {
             return response()->json([

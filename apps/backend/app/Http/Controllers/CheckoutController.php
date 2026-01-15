@@ -106,16 +106,60 @@ class CheckoutController extends Controller
         }
 
         // Helper to group items
-        $order->items->transform(function ($item) {
-            if ($item->item_type === 'seat') {
-                $item->details = \App\Models\Seat::find($item->item_id); // N+1 but ok for single order
-            } elseif ($item->item_type === 'ticket_type') {
-                $item->details = \App\Models\TicketType::find($item->item_id);
-            } else {
-                $item->details = \App\Models\Addon::find($item->item_id);
+        // Efficiently load item details to prevent N+1 queries
+        $itemIdsByType = [
+            'seat' => [],
+            'ticket_type' => [],
+            'addon' => [],
+        ];
+
+        foreach ($order->items as $item) {
+            if (isset($itemIdsByType[$item->item_type])) {
+                $itemIdsByType[$item->item_type][] = $item->item_id;
+            }
+        }
+
+        $details = [
+            'seat' => \App\Models\Seat::whereIn('id', $itemIdsByType['seat'])->get()->keyBy('id'),
+            'ticket_type' => \App\Models\TicketType::whereIn('id', $itemIdsByType['ticket_type'])->get()->keyBy('id'),
+            'addon' => \App\Models\Addon::whereIn('id', $itemIdsByType['addon'])->get()->keyBy('id'),
+        ];
+
+        $order->items->transform(function ($item) use ($details) {
+            if (isset($details[$item->item_type]) && isset($details[$item->item_type][$item->item_id])) {
+                $item->details = $details[$item->item_type][$item->item_id];
             }
             return $item;
         });
+
+        // Auto-Complete Logic for SwanQRIS Mock Mode
+        if ($order->status === 'pending' && config('services.swanqris.mock_mode')) {
+            try {
+                // Simulate a successful payment update
+                // ideally we use the payment service to process this "webhook"
+                $paymentService = app(\App\Services\PaymentService::class);
+
+                // Construct payload expected by SwanQrisGateway
+                $ref = $order->order_number ?? (string) $order->id;
+                $mockPayload = [
+                    'originalPartnerReferenceNo' => $ref,
+                    'latestTransactionStatus' => '00',
+                    'transactionStatusDesc' => 'Success',
+                    'additionalInfo' => [
+                        'paymentReferenceNo' => 'MOCK-' . time()
+                    ]
+                ];
+
+                // Process fake webhook
+                $paymentService->handleWebhook($mockPayload);
+
+                // Refresh order data to show updated status
+                $order->refresh();
+            } catch (\Exception $e) {
+                // Log silent error in mock mode
+                \Illuminate\Support\Facades\Log::warning("Mock Auto-Complete Error: " . $e->getMessage());
+            }
+        }
 
         return response()->json($order);
     }
