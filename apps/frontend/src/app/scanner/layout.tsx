@@ -1,16 +1,23 @@
 import { ReactNode } from "react";
+import type { Viewport } from "next";
 
 export const metadata = {
     title: 'Tukutix Scanner',
     description: 'Scanner App for Tukutix Gate Staff',
     manifest: '/manifest.json',
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
-    themeColor: '#000000',
     appleWebApp: {
         capable: true,
         statusBarStyle: 'black-translucent',
         title: 'Tukutix Scanner',
     },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: '#000000',
 };
 
 export default function ScannerLayout({
