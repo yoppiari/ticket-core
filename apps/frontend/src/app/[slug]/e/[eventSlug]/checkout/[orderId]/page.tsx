@@ -176,7 +176,7 @@ export default function CheckoutPage() {
                                         <div>
                                             <h3 className="text-xl font-bold text-zinc-900 mb-2">Tickets Sent!</h3>
                                             <p className="text-zinc-500 max-w-md mx-auto">
-                                                Thank you for your purchase. E-tickets have been sent to <strong>{order.customer_email}</strong>.
+                                                Thank you for your purchase. E-tickets have been sent to <strong>{order.buyer_email || order.customer_email}</strong>.
                                             </p>
                                         </div>
                                         <Button className="mt-4 rounded-xl font-bold" onClick={() => window.print()}>
@@ -253,43 +253,42 @@ export default function CheckoutPage() {
                     {/* Right: Summary */}
                     <div className="space-y-6">
                         <Card className="rounded-3xl border-zinc-200 shadow-lg bg-zinc-900 text-white overflow-hidden">
-                            <CardHeader className="border-b border-white/10 p-6">
+                            <CardHeader className="border-b border-white/10 px-6 py-4">
                                 <CardTitle className="text-lg font-black uppercase tracking-wider">Order Summary</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-6 space-y-6">
+                            <CardContent className="px-6 py-6 space-y-6">
                                 <div className="space-y-4">
                                     {(order.items || []).map((item: any, i: number) => (
                                         <div key={i} className="flex justify-between items-start text-sm">
                                             <div>
-                                                <div className="font-bold text-white">{item.ticket_type?.name || 'Ticket'}</div>
+                                                <div className="font-bold text-white">{item.ticket_name || item.ticket_type?.name || 'Ticket'}</div>
                                                 <div className="text-zinc-400 text-xs">x{item.quantity}</div>
                                             </div>
                                             <div className="font-mono text-zinc-300">
-                                                {Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.price)}
+                                                {Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.subtotal || item.price * item.quantity || 0)}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className="border-t border-white/10 pt-4">
-                                    <div className="flex justify-between items-end">
-                                        <div className="text-zinc-400 text-xs uppercase font-bold tracking-widest">Total Amount</div>
+                                    <div className="flex justify-end items-end">
                                         <div className="text-3xl font-black tracking-tight">
                                             {Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(order.total_amount)}
                                         </div>
                                     </div>
                                 </div>
                             </CardContent>
-                            <CardFooter className="bg-white/5 p-4 text-[10px] text-zinc-500 text-center justify-center">
+                            <CardFooter className="bg-white/5 px-6 py-3 text-[10px] text-zinc-500 text-center justify-center">
                                 Encrypted & Secure Payment
                             </CardFooter>
                         </Card>
 
                         <div className="bg-white p-6 rounded-3xl border border-zinc-200 shadow-sm">
                             <div className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Buyer Details</div>
-                            <div className="font-bold text-zinc-900 text-lg">{order.customer_name}</div>
-                            <div className="text-zinc-500">{order.customer_email}</div>
-                            <div className="text-zinc-500">{order.customer_phone}</div>
+                            <div className="font-bold text-zinc-900 text-lg">{order.buyer_name || order.customer_name}</div>
+                            <div className="text-zinc-500">{order.buyer_email || order.customer_email}</div>
+                            <div className="text-zinc-500">{order.buyer_whatsapp || order.customer_phone}</div>
                         </div>
                     </div>
                 </div>

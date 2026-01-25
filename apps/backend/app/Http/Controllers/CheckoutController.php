@@ -103,6 +103,15 @@ class CheckoutController extends Controller
             $isOwner = true;
         }
 
+        // Allow access for recently created pending orders (within 1 hour)
+        // This handles cases where session cookies aren't sent properly
+        if (!$isOwner && $order->status === 'pending') {
+            $orderAge = now()->diffInMinutes($order->created_at);
+            if ($orderAge <= 60) {
+                $isOwner = true;
+            }
+        }
+
         if (!$isOwner) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -163,6 +172,6 @@ class CheckoutController extends Controller
             }
         }
 
-        return response()->json($order);
+        return response()->json(['order' => $order]);
     }
 }

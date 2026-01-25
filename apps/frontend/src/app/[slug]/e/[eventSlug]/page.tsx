@@ -90,12 +90,12 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
     const { tenant, event } = data;
 
     return (
-        <div className="min-h-screen bg-zinc-50 flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col">
             {/* Header / Nav */}
             <TenantHeader tenant={{ name: tenant.name, slug, branding: tenant.branding }} />
 
             {/* Hero Section */}
-            <div className="bg-white border-b relative overflow-hidden">
+            <div className="bg-white relative overflow-hidden">
                 {/* Banner Image */}
                 {event.banner_url && (
                     <div className="w-full h-[400px] relative">
@@ -194,7 +194,7 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
             </div>
 
             {/* Tickets & Content */}
-            <main className="max-w-7xl mx-auto px-6 -mt-12 mb-24 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+            <main className="max-w-7xl mx-auto px-6 py-12 mb-24 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
 
                 {/* Left column: Content & Tickets */}
                 <div className="lg:col-span-2 space-y-12">
@@ -229,10 +229,10 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
                 {/* Right column: Info & Sidebar */}
                 <div className="space-y-8">
                     <Card className="rounded-2xl border-zinc-200 shadow-xl overflow-hidden">
-                        <CardHeader className="bg-zinc-50 border-b p-8">
+                        <CardHeader className="bg-white border-b border-zinc-200 px-6 py-4">
                             <CardTitle className="text-lg font-black uppercase tracking-tight text-zinc-900">Terms & Conditions</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-8 space-y-4 text-zinc-600 text-sm leading-relaxed">
+                        <CardContent className="p-6 space-y-4 text-zinc-600 text-sm leading-relaxed">
                             {event.terms_and_conditions ? (
                                 <div className="prose prose-sm prose-zinc dark:prose-invert max-w-none text-zinc-600" dangerouslySetInnerHTML={{ __html: event.terms_and_conditions }} />
                             ) : (
@@ -242,8 +242,8 @@ export default async function EventLandingPage({ params }: { params: Promise<{ s
                                 </>
                             )}
                             <div className="pt-4 border-t border-zinc-200">
-                                <div className="text-[11px] font-black uppercase text-zinc-400 tracking-wider mb-2">Organizer</div>
-                                <div className="text-zinc-900 font-bold">{tenant.name}</div>
+                                <div className="text-[11px] font-black uppercase text-zinc-400 tracking-wider mb-3">Organizer</div>
+                                <div className="text-zinc-900 font-bold text-base">{tenant.name}</div>
                                 <div className="flex items-center gap-3 mt-3">
                                     <Link href={`/${tenant.slug}`} className="inline-flex items-center gap-1 text-amber-600 text-xs font-bold hover:underline">
                                         View Profile &rarr;
