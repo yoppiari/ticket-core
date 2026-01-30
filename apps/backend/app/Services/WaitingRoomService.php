@@ -34,7 +34,7 @@ class WaitingRoomService
         try {
             $this->cleanupActiveUsers($eventId);
 
-            $limit = config('ticketing.waiting_room_limit', 1000);
+            $limit = request()->query('simulate_war') ? 1 : config('ticketing.waiting_room_limit', 1000);
             $activeKey = "{$this->prefix}:{$eventId}:active";
 
             // 1. Is user already active?
