@@ -15,6 +15,9 @@ interface EventFormData {
     venue_address: string;
     status: 'draft' | 'published';
     description: string;
+    affiliate_enabled: boolean;
+    commission_type: 'percent' | 'fixed';
+    commission_value: number;
 }
 
 export default function CreateEventPage() {
@@ -28,7 +31,10 @@ export default function CreateEventPage() {
         venue_name: '',
         venue_address: '',
         status: 'draft',
-        description: ''
+        description: '',
+        affiliate_enabled: false,
+        commission_type: 'percent',
+        commission_value: 0
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -160,6 +166,52 @@ export default function CreateEventPage() {
                             onChange={e => setFormData({ ...formData, venue_address: e.target.value })}
                             placeholder="Main Hall, Jl. Jend. Sudirman..."
                         />
+                    </div>
+
+                    <div className="pt-4 border-t dark:border-zinc-800">
+                        <div className="flex items-center gap-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="affiliate_enabled"
+                                className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black"
+                                checked={formData.affiliate_enabled}
+                                onChange={e => setFormData({ ...formData, affiliate_enabled: e.target.checked })}
+                            />
+                            <label htmlFor="affiliate_enabled" className="text-sm font-medium">Enable Affiliate Program</label>
+                        </div>
+
+                        {formData.affiliate_enabled && (
+                            <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-zinc-100 dark:border-zinc-800">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Commission Type</label>
+                                    <select
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                        value={formData.commission_type}
+                                        onChange={e => setFormData({ ...formData, commission_type: e.target.value as any })}
+                                    >
+                                        <option value="percent">Percentage (%)</option>
+                                        <option value="fixed">Fixed Amount (IDR)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Commission Value</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step={formData.commission_type === 'percent' ? '0.1' : '1000'}
+                                        required={formData.affiliate_enabled}
+                                        className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                        value={formData.commission_value}
+                                        onChange={e => setFormData({ ...formData, commission_value: parseFloat(e.target.value) })}
+                                    />
+                                    <p className="text-xs text-zinc-500 mt-1">
+                                        {formData.commission_type === 'percent'
+                                            ? 'Enter percentage (e.g. 10 for 10%)'
+                                            : 'Enter amount in IDR (e.g. 10000)'}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

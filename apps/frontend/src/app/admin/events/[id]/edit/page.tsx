@@ -33,6 +33,9 @@ interface Event {
     terms_and_conditions?: string;
     facilities?: string;
     social_media?: any[];
+    affiliate_enabled?: boolean;
+    commission_type?: 'percent' | 'fixed';
+    commission_value?: number;
 }
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -77,7 +80,10 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                     banner_url: eventData.banner_url || '',
                     terms_and_conditions: eventData.terms_and_conditions || '',
                     facilities: eventData.facilities || '',
-                    social_media: eventData.social_media || []
+                    social_media: eventData.social_media || [],
+                    affiliate_enabled: eventData.affiliate_enabled || false,
+                    commission_type: eventData.commission_type || 'percent',
+                    commission_value: eventData.commission_value || 0
                 });
             } else {
                 alert('Failed to load event');
@@ -154,7 +160,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-                    {['Details', 'Location', 'Content', 'Tickets', 'Add-ons'].map((tab) => (
+                    {['Details', 'Location', 'Content', 'Tickets', 'Add-ons', 'Affiliate'].map((tab) => (
                         <TabsTrigger
                             key={tab}
                             value={tab.toLowerCase().replace(' ', '-')}
@@ -377,6 +383,63 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                         <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <AddonManager eventId={id} />
                         </div>
+                    </TabsContent>
+
+                    {/* Affiliate Tab */}
+                    <TabsContent value="affiliate">
+                        <form onSubmit={handleUpdate} className="max-w-2xl space-y-6 bg-white dark:bg-zinc-950 p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <input
+                                        type="checkbox"
+                                        id="affiliate_edit"
+                                        className="w-4 h-4 rounded border-zinc-300 text-black focus:ring-black"
+                                        checked={formData.affiliate_enabled}
+                                        onChange={e => setFormData({ ...formData, affiliate_enabled: e.target.checked })}
+                                    />
+                                    <label htmlFor="affiliate_edit" className="text-sm font-medium">Enable Affiliate Program</label>
+                                </div>
+
+                                {formData.affiliate_enabled && (
+                                    <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-zinc-100 dark:border-zinc-800">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Commission Type</label>
+                                            <select
+                                                className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                                value={formData.commission_type}
+                                                onChange={e => setFormData({ ...formData, commission_type: e.target.value as any })}
+                                            >
+                                                <option value="percent">Percentage (%)</option>
+                                                <option value="fixed">Fixed Amount (IDR)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Commission Value</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step={formData.commission_type === 'percent' ? '0.1' : '1000'}
+                                                required={formData.affiliate_enabled}
+                                                className="w-full p-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800"
+                                                value={formData.commission_value}
+                                                onChange={e => setFormData({ ...formData, commission_value: parseFloat(e.target.value) })}
+                                            />
+                                            <p className="text-xs text-zinc-500 mt-1">
+                                                {formData.commission_type === 'percent'
+                                                    ? 'Enter percentage (e.g. 10 for 10%)'
+                                                    : 'Enter amount in IDR (e.g. 10000)'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="pt-4 border-t dark:border-zinc-800 flex justify-end">
+                                <Button type="submit" disabled={saving} className="bg-black text-white hover:bg-zinc-800">
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                    Save Affiliate Settings
+                                </Button>
+                            </div>
+                        </form>
                     </TabsContent>
 
 

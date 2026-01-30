@@ -4,7 +4,6 @@ import React, { Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; // Adjust import based on your UI lib
 import TeamSettings from '@/components/admin/settings/TeamSettings';
-import AffiliateSettings from '@/components/admin/settings/AffiliateSettings';
 import GeneralSettings from '@/components/admin/settings/GeneralSettings';
 import dynamic from 'next/dynamic';
 
@@ -39,12 +38,6 @@ function AdminSettingsContent() {
                     >
                         Team
                     </TabsTrigger>
-                    <TabsTrigger
-                        value="affiliate"
-                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:text-black px-0 py-3 text-zinc-500 hover:text-zinc-700 transition font-medium"
-                    >
-                        Affiliate Program
-                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="general" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -53,10 +46,6 @@ function AdminSettingsContent() {
 
                 <TabsContent value="team" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <TeamSettings />
-                </TabsContent>
-
-                <TabsContent value="affiliate" className="mt-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <AffiliateSettings />
                 </TabsContent>
             </Tabs>
         </div>
