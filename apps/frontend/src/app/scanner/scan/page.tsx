@@ -218,7 +218,11 @@ export default function ScanPage() {
                             </button>
                             <button
                                 onClick={() => {
-                                    if (!inputEventId) return;
+                                    console.log("Start Online Scan clicked", inputEventId);
+                                    if (!inputEventId) {
+                                        alert("Please enter an Event ID");
+                                        return;
+                                    }
                                     setEventId(inputEventId);
                                     setScanMode('online');
                                 }}
@@ -277,8 +281,8 @@ export default function ScanPage() {
             {/* Result Overlay */}
             {scanResult && (
                 <div className={`p-6 rounded-xl text-center font-bold text-xl shadow-2xl animate-in fade-in zoom-in duration-300 ${scanResult.status === 'valid' ? 'bg-green-600 text-white' :
-                        scanResult.status === 'duplicate' ? 'bg-yellow-500 text-black' :
-                            'bg-red-600 text-white'
+                    scanResult.status === 'duplicate' ? 'bg-yellow-500 text-black' :
+                        'bg-red-600 text-white'
                     }`}>
                     <div className="text-3xl mb-1">{scanResult.status === 'valid' ? '✅' : scanResult.status === 'duplicate' ? '⚠️' : '🚫'}</div>
                     <div className="text-2xl tracking-tight">{scanResult.status.toUpperCase()}</div>
