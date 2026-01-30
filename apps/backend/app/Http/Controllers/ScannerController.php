@@ -48,4 +48,20 @@ class ScannerController extends Controller
 
         return response()->json(['results' => $results]);
     }
+
+    public function scan(Request $request, $eventId)
+    {
+        $request->validate([
+            'ticket_code' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        if (!$user->tenant_id) {
+            abort(403, 'User does not belong to a tenant');
+        }
+
+        $result = $this->scannerService->validateTicket($request->ticket_code, $eventId, $user);
+
+        return response()->json($result);
+    }
 }

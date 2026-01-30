@@ -103,4 +103,70 @@ class ScannerService
 
         return $results;
     }
+
+    /**
+     * Validate a single ticket in real-time (Online Mode).
+     */
+    public function validateTicket($ticketCode, $eventId, $gateStaff)
+    {
+        $tenantId = $gateStaff->tenant_id;
+
+        // 1. Find Ticket
+        $ticket = Ticket::where('ticket_code', $ticketCode)
+            ->where('event_id', $eventId)
+            ->whereHas('event', function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            })
+            ->first();
+
+        if (!$ticket) {
+            return [
+                'status' => 'invalid',
+                'message' => 'Ticket not found or access denied',
+                'ticket' => null
+            ];
+        }
+
+        // 2. Check Validity
+        if ($ticket->status === 'revoked') {
+            return [
+                'status' => 'invalid',
+                'message' => 'Ticket is revoked',
+                'ticket' => $ticket
+            ];
+        }
+
+        // 3. Check Duplicate
+        if ($ticket->checked_in_at) {
+            return [
+                'status' => 'duplicate',
+                'message' => 'Already scanned at ' . $ticket->checked_in_at,
+                'ticket' => $ticket
+            ];
+        }
+
+        // 4. Success - Update Ticket & Log
+        $scannedAt = now();
+        
+        DB::transaction(function() use ($ticket, $gateStaff, $eventId, $scannedAt) {
+            $ticket->checked_in_at = $scannedAt;
+            $ticket->save();
+
+            ScanLog::create([
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'event_id' => $eventId,
+                'ticket_id' => $ticket->id,
+                'gate_staff_id' => $gateStaff->id,
+                'status' => 'valid',
+                'scanned_at' => $scannedAt,
+                'is_offline_sync' => false,
+            ]);
+        });
+
+        return [
+            'status' => 'valid',
+            'message' => 'Welcome!',
+            'ticket' => $ticket
+        ];
+    }
 }

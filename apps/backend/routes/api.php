@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('scanner')->group(function () {
         Route::get('/events/{eventId}/tickets', [\App\Http\Controllers\ScannerController::class, 'getTickets']);
         Route::post('/events/{eventId}/logs', [\App\Http\Controllers\ScannerController::class, 'syncLogs']);
+        Route::post('/events/{eventId}/scan', [\App\Http\Controllers\ScannerController::class, 'scan']);
     });
 
     // Affiliate Routes
