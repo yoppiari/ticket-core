@@ -8,12 +8,17 @@ import ClientRedirect from "./ClientRedirect";
 
 
 
-export default async function WaitingRoomPage({ params }: { params: Promise<{ slug: string, eventSlug: string }> }) {
+export default async function WaitingRoomPage({ params, searchParams }: { params: Promise<{ slug: string, eventSlug: string }>, searchParams: Promise<Record<string, string>> }) {
     const { slug, eventSlug } = await params;
-    const status = await getQueueStatus(eventSlug);
+    const query = await searchParams;
+    const status = await getQueueStatus(eventSlug, query);
 
     if (status?.status === 'admitted') {
-        redirect(`/${slug}/e/${eventSlug}`);
+        const url = new URL(`/${slug}/e/${eventSlug}`, 'http://localhost'); // Dummy base for URL construction with searchParams
+        if (query) {
+            url.search = new URLSearchParams(query).toString();
+        }
+        redirect(`${url.pathname}${url.search}`);
     }
 
     return (

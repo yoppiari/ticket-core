@@ -56,10 +56,14 @@ export async function getPublicEvent(tenantSlug: string, eventSlug: string, sear
     }
 }
 
-export async function getQueueStatus(eventSlug: string) {
+export async function getQueueStatus(eventSlug: string, searchParams?: Record<string, string>) {
     try {
         const baseUrl = getBaseUrl();
-        const res = await fetch(`${baseUrl}/api/public/events/${eventSlug}/queue-status`, { cache: 'no-store' });
+        const url = new URL(`${baseUrl}/api/public/events/${eventSlug}/queue-status`);
+        if (searchParams) {
+            url.search = new URLSearchParams(searchParams).toString();
+        }
+        const res = await fetch(url.toString(), { cache: 'no-store' });
         if (!res.ok) return null;
         return res.json();
     } catch (e) {

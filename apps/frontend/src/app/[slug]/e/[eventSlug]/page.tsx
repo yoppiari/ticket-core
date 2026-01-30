@@ -85,7 +85,11 @@ export default async function EventLandingPage({ params, searchParams }: { param
     }
 
     if (data.isQueued) {
-        redirect(`/${slug}/e/${eventSlug}/waiting-room`);
+        const url = new URL(`/${slug}/e/${eventSlug}/waiting-room`, 'http://localhost');
+        if (query) {
+            url.search = new URLSearchParams(query).toString();
+        }
+        redirect(`${url.pathname}${url.search}`);
     }
 
     const { tenant, event } = data;

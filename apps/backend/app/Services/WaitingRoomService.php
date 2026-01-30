@@ -37,6 +37,11 @@ class WaitingRoomService
             $limit = request()->query('simulate_war') ? 0 : config('ticketing.waiting_room_limit', 1000);
             $activeKey = "{$this->prefix}:{$eventId}:active";
 
+            // If simulating, force eviction first to ensure they get queued
+            if (request()->query('simulate_war')) {
+                Redis::zrem($activeKey, $token);
+            }
+
             // 1. Is user already active?
             if (Redis::zscore($activeKey, $token) !== null) {
                 // Update heartbeat
