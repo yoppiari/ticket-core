@@ -75,9 +75,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function EventLandingPage({ params }: { params: Promise<{ slug: string, eventSlug: string }> }) {
+export default async function EventLandingPage({ params, searchParams }: { params: Promise<{ slug: string, eventSlug: string }>, searchParams: Promise<Record<string, string>> }) {
     const { slug, eventSlug } = await params;
-    const data = await getPublicEvent(slug, eventSlug);
+    const query = await searchParams; // Await searchParams in Next.js 15
+    const data = await getPublicEvent(slug, eventSlug, query);
 
     if (!data || !data.tenant || !data.event) {
         return notFound();

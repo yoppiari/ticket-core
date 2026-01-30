@@ -26,10 +26,15 @@ export async function getTenant(slug: string) {
     }
 }
 
-export async function getPublicEvent(tenantSlug: string, eventSlug: string) {
+export async function getPublicEvent(tenantSlug: string, eventSlug: string, searchParams?: Record<string, string>) {
     try {
         const baseUrl = getBaseUrl();
-        const res = await fetch(`${baseUrl}/api/public/tenants/${tenantSlug}/events/${eventSlug}`, {
+        const url = new URL(`${baseUrl}/api/public/tenants/${tenantSlug}/events/${eventSlug}`);
+        if (searchParams) {
+            url.search = new URLSearchParams(searchParams).toString();
+        }
+
+        const res = await fetch(url.toString(), {
             cache: 'no-store'
         });
 
