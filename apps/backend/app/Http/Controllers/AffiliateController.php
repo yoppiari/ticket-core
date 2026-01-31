@@ -15,6 +15,20 @@ class AffiliateController extends Controller
         $this->affiliateService = $affiliateService;
     }
 
+    public function track(Request $request)
+    {
+        $request->validate([
+            'ref' => 'required|string|exists:affiliates,referral_code'
+        ]);
+
+        $code = $request->input('ref');
+
+        // Increment Clicks
+        \App\Models\Affiliate::where('referral_code', $code)->increment('clicks');
+
+        return response()->json(['success' => true]);
+    }
+
     public function register(Request $request)
     {
         $request->validate([

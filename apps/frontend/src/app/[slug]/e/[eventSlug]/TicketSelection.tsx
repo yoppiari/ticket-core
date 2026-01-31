@@ -63,7 +63,11 @@ export default function TicketSelection({ tickets, primaryColor = '#3b82f6' }: T
         setError(null);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/public/events/${params.eventSlug}/checkout`, {
+            // Retrieve affiliate ref from localStorage if available
+            const affiliateRef = localStorage.getItem('affiliate_ref');
+            const queryParams = affiliateRef ? `?ref=${encodeURIComponent(affiliateRef)}` : '';
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/public/events/${params.eventSlug}/checkout${queryParams}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

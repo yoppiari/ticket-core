@@ -12,6 +12,7 @@ import TenantHeader from "@/components/tenant/TenantHeader";
 import TenantFooter from "@/components/tenant/TenantFooter";
 import ShareButton from "@/components/public/ShareButton";
 import RemindMeButton from "@/components/public/RemindMeButton";
+import AffiliateTracker from "@/components/public/AffiliateTracker";
 
 // Allow dynamic params at runtime
 export const dynamic = 'force-dynamic';
@@ -200,6 +201,7 @@ export default async function EventLandingPage({ params, searchParams }: { param
 
             {/* Tickets & Content */}
             <main className="max-w-7xl mx-auto px-6 py-12 mb-24 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                <AffiliateTracker />
 
                 {/* Left column: Content & Tickets */}
                 <div className="lg:col-span-2 space-y-12">

@@ -116,3 +116,6 @@ Route::post('/webhooks/payment/{provider}', [\App\Http\Controllers\WebhookContro
 Route::post('/b2b/token', [\App\Http\Controllers\SwanQrisCallbackController::class, 'getToken']);
 Route::post('/qris/notify', [\App\Http\Controllers\SwanQrisCallbackController::class, 'notify']);
 
+// Public Affiliate Tracking
+Route::post('/affiliates/track', [\App\Http\Controllers\AffiliateController::class, 'track']);
+
