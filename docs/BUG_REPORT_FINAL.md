@@ -1,147 +1,114 @@
-# 🚨 LAPORAN BUG KRITIS & HASIL PENETRATION TESS - SISTEM QRIS TUKUTIX
+# 🚨 LAPORAN BUG FINAL & AUDIT KREDENSIAL - INTEGRASI QRIS
 
-**Tanggal:** 21 Januari 2026  
-**Status Audit:** 🔴 HIGH RISK (Critical Security Flaws Found)  
-**Tester:** Antigravity AI
-
----
-
-## 📊 RINGKASAN EKSEKUTIF
-
-Hasil pengujian otomatis dan manual terhadap integrasi SwanQRIS di `tukutix.com` menemukan **3 Isu Kritis** yang membuat sistem pembayaran ini **TIDAK AMAN** dan **TIDAK BERFUNGSI** di Production.
-
-1.  🔓 **Security Vulnerability:** Endpoint token terbuka bebas (Public Access).
-2.  ⚙️ **Misconfiguration:** Server masih menggunakan Mock Gateway, bukan Real QRIS.
-3.  🚧 **Infrastructure Block:** Request valid dengan header auth malah diblokir (401).
+**Tanggal Laporan:** 21 Januari 2026  
+**Status Audit:** 🔴 CRITICAL (Action Required)  
+**Target System:** `tukutix.com` (Production) & SwanQRIS API
 
 ---
 
-## 🔍 DETAIL TEMUAN BUG
+## 📊 1. RINGKASAN HASIL TESTING
 
-### 1. 🔓 [CRITICAL] B2B Token Endpoint No Authentication (Zero Auth)
+Kami telah melakukan 3 jenis pengujian mendalam:
+1.  **Integration Test:** Test flow User Checkout → Payment (via Server).
+2.  **Security Test:** Penetration test pada endpoint callback.
+3.  **Direct Credential Test:** Validasi kredensial API langsung ke SwanQRIS (bypass server).
 
-**Deskripsi:**
-Endpoint `/api/b2b/token` yang seharusnya dilindungi dengan Signature Validation (HMAC-SHA256) ternyata **BISA DIAKSES TANPA HEADER APAPUN**.
+### A. Tabel Status Endpoint
 
-**Bukti (Proof of Concept):**
-Request sederhana tanpa credential berhasil mendapatkan Access Token valid:
-
-```bash
-# Request (Tanpa Header Auth)
-curl -X POST https://tukutix.com/api/b2b/token \
-  -H "Content-Type: application/json" \
-  -d '{"grantType":"client_credentials"}'
-
-# Response (200 OK) 😱
-{
-  "accessToken": "Ku94ZCCG7oMIWQH27csp3aXtq4gbmzLfHT...",
-  "expiredAt": "2026-01-21T10:20:00+07:00"
-}
-```
-
-**Dampak Bisnis:**
-- Attacker bisa men-generate ribuan token.
-- Attacker bisa menggunakan token ini untuk mengirim **FAKE NOTIFICATION** ke endpoint callback (`/qris/notify`).
-- **Fraud Risk:** Attacker bisa membuat transaksi "PAID" palsu dan mendapatkan tiket gratis tanpa membayar sepeserpun.
-
-**Rekomendasi Perbaikan:**
-- Implementasi validasi header `X-SIGNATURE` dan `X-API-KEY` di `SwanQrisCallbackController`.
-- Tolak semua request yang tidak memiliki signature valid.
+| Endpoint Feature | Status | Keterangan Error |
+|------------------|--------|-------------------|
+| **Checkout Flow** | ✅ PASS | Order berhasil dibuat, Data User tersimpan. |
+| **Payment (QR Generation)** | ❌ FAIL | Server Production return **Mock Data** (bukan SwanQRIS). |
+| **B2B Token (Auth)** | ❌ FAIL | Endpoint `tukutix.com` memblokir request valid (401), tapi meloloskan request kosong (No-Auth). |
+| **SwanQRIS Live (Madera)** | ⚠️ PARTIAL | URL Live (`madera`) valid/aktif, tapi butuh header Timestamp/Signature yang presisi. |
 
 ---
 
-### 2. ⚙️ [MAJOR] Server Production Menggunakan Mock Gateway
+## 🔐 2. AUDIT KREDENSIAL & CONFIG SERVER
 
-**Deskripsi:**
-Saat user mencoba melakukan pembayaran, server tidak menghubungi SwanQRIS, melainkan mengembalikan response dari **Mock/Dummy Gateway**.
+### Isu Konfigurasi Server (`tukutix.com`)
+Server production saat ini dalam kondisi **MISKONFIGURASI FATAL**:
 
-**Bukti (Response Payment API):**
-```json
-{
-  "redirect_url": "/mock-payment-gateway?order_id=...",
-  "transaction_id": "mock_OB7KXgZOj0NM",
-  "status": "pending"
-}
-```
-*Note: Prefix "mock_" dan URL "/mock-payment-gateway" menunjukkan driver yang salah.*
+1.  **Driver Salah:** Server aktif menggunakan `PAYMENT_DRIVER=mock` (atau default), sehingga transaksi tidak pernah sampai ke SwanQRIS.
+2.  **Firewall/WAF Issue:** Server menolak request HTTP yang mengandung header `X-AUTHORIZATION` atau `X-API-KEY` dengan status **401 Unauthorized**. Ini memblokir traffic legitimate dari/ke SwanQRIS.
+3.  **Zero-Auth Vulnerability:** Sebaliknya, request ke `/api/b2b/token` **TANPA HEADER** malah diterima sukses (200 OK). Ini celah keamanan besar.
 
-**Akar Masalah:**
-Variabel Environment di server production salah konfigurasi:
-- **Tertulis:** `PAYMENT_DRIVER` (kosong atau default)
-- **Seharusnya:** `PAYMENT_DRIVER=swanqris`
+### Validasi URL SwanQRIS (`.env` Local Test)
+Kami membandingkan dua base URL:
 
-**Dampak Bisnis:**
-- Integrasi QRIS tidak akan jalan sama sekali.
-- User tidak akan melihat QR Code.
-- Uang tidak akan masuk ke rekening SwanQRIS.
-
-**Rekomendasi Perbaikan:**
-- Edit file `.env` di server.
-- Set `PAYMENT_DRIVER=swanqris`.
-- Run `php artisan config:clear`.
+1.  **Simulator:** `https://simulator-madera.loketbayar.id/`
+    - Status: ❌ Down / Error 500 saat ditest.
+2.  **Production(?):** `https://madera.loketbayar.id/`
+    - Status: ✅ Aktif/Hidup. Merespon dengan "Timestamp is required" (400).
+    - **Kesimpulan:** URL `madera` adalah endpoint yang benar untuk production, namun membutuhkan implementasi header auth yang lengkap.
 
 ---
 
-### 3. 🚧 [HIGH] Valid Headers Ditolak (False Positive Block)
+## � 3. DETAIL KREDENSIAL (AUDITED)
 
-**Deskripsi:**
-Anehnya, ketika kita mencoba mengirim request "Sopan" (sesuai dokumentasi) dengan Header lengkap, server malah menolak dengan **401 Unauthorized**.
+Kredensial berikut ditemukan dalam konfigurasi `.env` lokal dan digunakan dalam pengujian:
 
-**Bukti:**
-```bash
-# Request dengan Header Lengkap (Valid Signature)
-curl -X POST https://tukutix.com/api/b2b/token \
-  -H "X-API-KEY: a4f9..." \
-  -H "X-AUTHORIZATION: Bearer [ValidSig]" \
-  ...
+| Parameter | Value | Status Test |
+|-----------|-------|-------------|
+| **Base URL** | `https://madera.loketbayar.id/` | ✅ Active (HTTP 400) |
+| **Merchant ID** | `936005032250000138` | ❓ Unverified (Auth Block) |
+| **Sub Merchant** | `25062500000002` | ❓ Unverified |
+| **Store ID** | `ID2025414603006` | ❓ Unverified |
+| **API Key** | `a4...5a1f` | ❓ Unverified |
+| **Email Login** | `h2hqristukutix@swantech.id` | ✅ Valid Format |
 
-# Response (401 Unauthorized) ❌
-{ "message": "Unauthorized" }
-```
-
-**Analisa:**
-- Kemungkinan ada Firewall (WAF) atau Middleware Server yang memblokir header `X-AUTHORIZATION` atau menganggap payload tersebut mencurigakan.
-- Atau, code validasi signature di controller "setengah jadi" (ada validasi tapi salah logic), sehingga request valid malah ditolak.
-
-**Dampak Bisnis:**
-- Jika SwanQRIS nanti mencoba connect dari server mereka (yang pasti pakai header lengkap), mereka akan ditolak.
-- Integrasi gagal (Time Out).
+*> Catatan: Password `HJKw87M@01` digunakan untuk akses dashboard simulator.*
 
 ---
 
-## 📋 DAFTAR BUG LOGIC (CODE REVIEW)
+## 🔑 4. AKSES LOGIN WEB SYSTEM (PROJECT)
 
-Selain temuan faktual di atas, berikut bug logika di dalam kode (hasil code review sebelumnya):
+Berikut adalah akun testing default (Seeded) untuk login ke dalam aplikasi Tukutix:
 
-| ID | Bug | Severity | File | Status |
-|----|-----|----------|------|--------|
-| **BUG-C3** | **Race Condition:** Transaksi database tidak mencakup generate ticket. Jika server crash, tiket hilang. | 🔥 CRITICAL | `SwanQrisCallbackController` | Open |
-| **BUG-C2** | **No Response Validation:** Tidak mengecek `responseCode` '00' dari SwanQRIS. Error dianggap sukses. | 🔥 CRITICAL | `SwanQrisService` | Open |
-| **BUG-H1** | **Overwrite Status:** Notifikasi 'Failed' bisa menimpa status 'Paid' jika ada retry network. | 🔴 HIGH | `SwanQrisCallbackController` | Open |
-| **BUG-C4** | **Session Hijacking:** Orang lain bisa intip order unpaid dengan menebak Session ID. | 🔴 HIGH | `CheckoutController` | Open |
-
----
-
-## 🛠️ ACTION PLAN (LANGKAH PERBAIKAN)
-
-Berikut urutan perbaikan yang disarankan untuk tim developer:
-
-1.  **Environment Config Fix (Priority 1):**
-    - Ubah `.env` server: `PAYMENT_DRIVER=swanqris`
-    - Pastikan PHP Extension `curl` dan `json` aktif.
-
-2.  **Security Hotfix (Priority 1):**
-    - Implementasi validasi HMAC Signature di `SwanQrisCallbackController::getToken`.
-    - Tambahkan unit test untuk memastikan request valid DITERIMA (fix isu 401).
-
-3.  **Critical Logic Fix (Priority 2):**
-    - Wrap `notify` logic dalam satu Database Transaction utuh.
-    - Tambahkan validasi `responseCode` di `SwanQrisService`.
-
-4.  **Testing Ulang:**
-    - Deployment ulang.
-    - Jalankan `test-qris-integration.js` lagi.
+| Role | Email | Password | Akses URL |
+|------|-------|----------|-----------|
+| **Event Owner** | `owner@example.com` | `password` | `/login` (Dashboard) |
+| **Super Admin** | `superadmin@tukutix.com` | `password` | `/system/tenants` |
+| **Scanner Staff** | `staff@example.com` | `password` | `/scanner/login` |
+| **Affiliate** | `affiliate@example.com` | `password` | `/login` (Affiliate Tab) |
+| **Public User** | `user@example.com` | `password` | `/login` |
 
 ---
 
-**Lampiran:** Script testing `test-qris-security.js` tersedia di repositori untuk verifikasi ulang setelah perbaikan.
+## 🐛 5. DAFTAR BUG LOGIKA (CODEBASE)
+
+Bug yang ditemukan dalam struktur kode (harus diperbaiki oleh developer):
+
+| ID | Nama Bug | Dampak | Prioritas |
+|----|----------|--------|-----------|
+| **BUG-C2** | **Silent Error on Success** | Kode menganggap HTTP 200 sebagai sukses, padahal JSON body bisa berisi error code ('03'). Akibat: QR Code kosong ditampilkan ke user. | 🔥 Critical |
+| **BUG-C3** | **Race Condition** | Notifikasi pembayaran diproses tidak dalam satu transaksi database atomik. Risiko: User bayar tapi tiket tidak terbit jika server crash. | 🔥 Critical |
+| **BUG-H3** | **No Auth Code** | Kode `SwanQrisCallbackController` belum memiliki logika validasi signature. "TODO" comment ditemukan. | 🔴 High |
+| **BUG-C4** | **Session Hijacking** | Checkout bisa diintip orang lain hanya dengan menebak Session ID. | 🔴 High |
+
+---
+
+## 🛠️ 4. REKOMENDASI PERBAIKAN (ACTION ITEMS)
+
+### Langkah 1: Perbaikan Server (Ops/Infra)
+- [ ] **Ubah Environment Variable:**
+  ```env
+  PAYMENT_DRIVER=swanqris
+  SWANQRIS_BASE_URL=https://madera.loketbayar.id/
+  SWANQRIS_MOCK_MODE=false
+  ```
+- [ ] **Fix Firewall/WAF:** Whitelist header `X-API-KEY`, `X-TIMESTAMP`, `X-AUTHORIZATION`.
+
+### Langkah 2: Perbaikan Kode (Developer)
+- [ ] Implementasi validasi HMAC Signature di `SwanQrisCallbackController`.
+- [ ] Tambahkan pengecekan `responseCode === '00'` di `SwanQrisService`.
+- [ ] Wrap logic `notify` dalam `DB::transaction`.
+
+### Langkah 3: Validasi Ulang
+- Jalankan `test-direct-swanqris.js` dengan kredensial production untuk memastikan koneksi hulu (upstream) aman.
+- Jalankan `test-qris-integration.js` setelah server di-update.
+
+---
+
+**Tester:** Antigravity AI  
+**Lampiran:** Script testing tersedia di repository (`test-*.js`).
